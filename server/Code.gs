@@ -31,6 +31,7 @@ function setup() {
   ro.getRange(1, 1, 1, 2).setFontWeight('bold').setBackground('#0E6D62').setFontColor('#FFFFFF');
 
   var c = ss.getSheetByName(CONFIG_SHEET) || ss.insertSheet(CONFIG_SHEET);
+  c.getRange('B:B').setNumberFormat('@');
   if (c.getLastRow() === 0) {
     c.appendRow(['항목', '값']);
     c.appendRow(['선생님 비밀번호', '0000']);
