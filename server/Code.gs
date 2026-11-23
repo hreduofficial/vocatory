@@ -10,13 +10,14 @@
 var RESULT_SHEET = '결과';
 var ROSTER_SHEET = '명단';
 var CONFIG_SHEET = '설정';
-var RESULT_HEAD = ['일시', '반', '이름', '호', '교재', 'DAY', '시험 종류', '맞은 수', '문항 수', '점수(%)', '결과', '확인 코드', '틀린 단어', 'mode', 'd', '받은 시각'];
+var RESULT_HEAD = ['일시', '반', '이름', '호', '교재', 'DAY', '시험 종류', '맞은 수', '문항 수', '점수(%)', '결과', '확인 코드', '틀린 단어', 'mode', 'd', '받은 시각', 'XP', '최대 콤보'];
 
 function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var r = ss.getSheetByName(RESULT_SHEET) || ss.insertSheet(RESULT_SHEET);
   if (r.getLastRow() === 0) r.appendRow(RESULT_HEAD);
-  r.getRange('A:P').setNumberFormat('@');
+  r.getRange('A:R').setNumberFormat('@');
+  r.getRange(1, 1, 1, RESULT_HEAD.length).setValues([RESULT_HEAD]);
   r.setFrozenRows(1);
   r.getRange(1, 1, 1, RESULT_HEAD.length).setFontWeight('bold').setBackground('#0E6D62').setFontColor('#FFFFFF');
   r.hideColumns(14, 2);
@@ -63,7 +64,8 @@ function results_() {
   var vals = sh.getDataRange().getDisplayValues().slice(1);
   return vals.map(function (x) {
     return { when: x[0], cls: x[1], name: x[2], v: +x[3], d: x[14], mode: x[13], score: +x[7], total: +x[8], pct: +x[9],
-      pass: x[10] === '-' ? null : x[10] === '합격', code: x[11] };
+      pass: x[10] === '-' ? null : x[10] === '합격', code: x[11],
+      xp: x[16] !== undefined && x[16] !== '' ? +x[16] : null, combo: +(x[17] || 0) };
   });
 }
 
@@ -72,8 +74,19 @@ function doGet(e) {
   try {
     if (p.action === 'roster') return json_({ ok: true, roster: roster_() });
     if (p.action === 'mine') {
-      var mine = results_().filter(function (r) { return r.cls === p.cls && r.name === p.name && r.mode === 'day'; });
+      var mine = results_().filter(function (r) { return r.cls === p.cls && r.name === p.name; });
       return json_({ ok: true, results: mine });
+    }
+    if (p.action === 'rank') {
+      var agg = {};
+      results_().forEach(function (r) {
+        if (r.cls !== p.cls || (p.since && r.when < p.since)) return;
+        var xp = r.xp !== null ? r.xp : (r.mode === 'retry' ? r.score * 5 : r.score * 10 + (r.pass ? 50 : 0) + (r.pct === 100 && r.total >= 10 ? 50 : 0));
+        var a = agg[r.name] || (agg[r.name] = { name: r.name, xp: 0, n: 0 });
+        a.xp += xp; a.n++;
+      });
+      var list = Object.keys(agg).map(function (k) { return agg[k]; }).sort(function (a, b) { return b.xp - a.xp; });
+      return json_({ ok: true, rank: list });
     }
     if (p.action === 'results') {
       if (String(p.pw) !== teacherPw_()) return json_({ ok: false, error: 'password' });
@@ -96,6 +109,7 @@ function doPost(e) {
     if (body.action === 'result') {
       var list = body.results || [body.r];
       var sh = ss.getSheetByName(RESULT_SHEET);
+      if (sh.getRange(1, 17).getValue() === '') sh.getRange(1, 17, 1, 2).setValues([['XP', '최대 콤보']]);
       var existing = {};
       sh.getRange(1, 12, Math.max(sh.getLastRow(), 1), 1).getDisplayValues().forEach(function (x, i) { existing[x[0]] = 1; });
       var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
@@ -107,7 +121,7 @@ function doPost(e) {
         existing[uid] = 1;
         sh.appendRow([r.when, r.cls || '', r.name, String(r.v), r.book || '', r.dayLabel || String(r.d), r.modeName || r.mode,
           String(r.score), String(r.total), String(r.pct), r.pass === null ? '-' : (r.pass ? '합격' : '재시험'), r.code,
-          (r.wrongWords || []).join(', '), r.mode, String(r.d), now]);
+          (r.wrongWords || []).join(', '), r.mode, String(r.d), now, String(r.xp == null ? '' : r.xp), String(r.combo || 0)]);
         saved.push(r.code);
       });
       return json_({ ok: true, saved: saved });

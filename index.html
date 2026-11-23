@@ -119,6 +119,43 @@ footer{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-l
 footer button{background:none;border:0;color:var(--muted);font-size:12px;text-decoration:underline}
 @media (min-width:520px){.vols{grid-template-columns:repeat(3,1fr)}.days{grid-template-columns:repeat(8,1fr)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.player{display:flex;gap:14px;align-items:center}
+.lvl{flex:0 0 auto;width:64px;height:64px;border-radius:50%;background:var(--teal);color:var(--teal-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 0 4px var(--teal-soft)}
+.lvn{font-family:var(--f-display);font-size:24px;line-height:1}
+.lvt{font-size:9px;letter-spacing:.16em;font-weight:700}
+.pinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.tier{font-family:var(--f-display);color:var(--teal);letter-spacing:.06em}
+.xpn{font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
+.xpbar{height:10px;border-radius:5px;background:var(--teal-soft);overflow:hidden}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .6s}
+.flame{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.flame::before{content:"";display:inline-block;width:9px;height:12px;margin-right:4px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:var(--line);vertical-align:-1px}
+.flame.lit{color:var(--bad)} .flame.lit::before{background:var(--bad)}
+.badges{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:520px){.badges{grid-template-columns:repeat(4,1fr)}}
+.badge{background:var(--paper);border:1px dashed var(--line);border-radius:10px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.5}
+.badge.on{opacity:1;border:1.5px solid var(--gold)}
+.medal{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-size:13px;background:var(--line);color:var(--muted)}
+.badge.on .medal{background:var(--gold);color:var(--paper);box-shadow:0 0 0 3px var(--teal-soft)}
+.badge b{font-size:13px} .badge small{font-size:11px;color:var(--muted);line-height:1.35}
+.combo{font-family:var(--f-display);font-size:13px;color:var(--gold);letter-spacing:.04em}
+.combo.hot{color:var(--bad)}
+#fb{position:relative}
+.xpfloat{position:absolute;right:8px;top:6px;font-family:var(--f-display);color:var(--gold);font-size:16px;animation:xpup .9s ease-out forwards;pointer-events:none}
+@keyframes xpup{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-26px)}}
+.gain{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:14px;width:100%;max-width:320px}
+.gain span:nth-child(even){text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.gain .tot{border-top:1px solid var(--line);padding-top:4px;color:var(--gold);font-family:var(--f-display)}
+.lvup{background:var(--teal);color:var(--teal-ink);border-radius:10px;padding:12px;text-align:center;font-weight:700;animation:pop .5s ease-out}
+.lvup b{font-family:var(--f-display);font-size:20px;display:block;letter-spacing:.04em}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.newb{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.newb .badge{opacity:1;border:1.5px solid var(--gold);width:120px;animation:pop .5s ease-out}
+.rk .rkn{font-family:var(--f-display);color:var(--muted);min-width:26px;text-align:center}
+.rk.top1 .rkn{color:var(--gold);font-size:18px} .rk.top2 .rkn,.rk.top3 .rkn{color:var(--teal)}
+.rk.me{background:var(--teal-soft);border-radius:8px;padding-inline:6px}
+.rk .w{flex:1}
+@media (prefers-reduced-motion:reduce){.xpfloat,.lvup,.newb .badge{animation:none}}
 </style>
 
 <header><div class="hwrap">
@@ -166,8 +203,8 @@ function flush(cb){
 function loadRoster(cb){if(!API_URL){if(cb)cb();return}S.rosterLoading=true;
   api({action:'roster'}).then(function(res){S.rosterLoading=false;if(res&&res.ok){store.roster=res.roster;persist()}if(cb)cb()}).catch(function(){S.rosterLoading=false;if(cb)cb()})}
 function loadMine(u){if(!API_URL)return;api({action:'mine',cls:u.cls,name:u.name}).then(function(res){if(!res||!res.ok)return;
-  var P=store.users[u.key]||(store.users[u.key]={prog:{},wrong:{}});
-  res.results.forEach(function(r){var k=r.v+'-'+r.d,pr=P.prog[k]||{best:0,pass:false,tries:0};pr.best=Math.max(pr.best,r.pct);if(r.pass)pr.pass=true;P.prog[k]=pr});
+  var P=store.users[u.key]||(store.users[u.key]={prog:{},wrong:{}});S.mine[u.key]=res.results;
+  res.results.forEach(function(r){if(r.mode!=='day')return;var k=r.v+'-'+r.d,pr=P.prog[k]||{best:0,pass:false,tries:0};pr.best=Math.max(pr.best,r.pct);if(r.pass)pr.pass=true;P.prog[k]=pr});
   persist();if(S.user&&S.user.key===u.key&&(S.view==='home'||S.view==='vol'))render()}).catch(function(){})}
 function who(){return store.mode==='academy'&&S.user?S.user:{name:store.name||'(이름 없음)',cls:''}}
 
@@ -269,12 +306,88 @@ function buildReview(v,d){
   return items;
 }
 
+/* ---------- game: XP, level, streak, badges ---------- */
+var TIERS=['STARTER','LEARNER','EXPLORER','ADVENTURER','MASTER','HERO','CHALLENGER','CHAMPION','LEGEND','TITAN'];
+function needFor(l){return 100+(l-1)*50} /* XP to go from level l to l+1 */
+function levelOf(xp){var l=1,rest=xp;while(rest>=needFor(l)&&l<30){rest-=needFor(l);l++}return{lv:l,into:rest,need:l>=30?0:needFor(l),tier:TIERS[Math.min(9,Math.floor((l-1)/3))]}}
+function xpOf(r){if(r.xp!=null&&r.xp!=='')return +r.xp;if(r.mode==='retry')return r.score*5;return r.score*10+(r.pass?50:0)+(r.pct===100&&r.total>=10?50:0)}
+S.mine={};
+function myResults(){
+  var me=who(),seen={},out=[];
+  store.hist.forEach(function(r){if(store.mode==='academy'&&!(r.name===me.name&&(r.cls||'')===(me.cls||'')))return;if(!seen[r.code]){seen[r.code]=1;out.push(r)}});
+  if(store.mode==='academy'&&S.user)(S.mine[S.user.key]||[]).forEach(function(r){if(!seen[r.code]){seen[r.code]=1;out.push(r)}});
+  return out;
+}
+function dateKey(t){return t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate())}
+function streakOf(rs){
+  var days={};rs.forEach(function(r){days[r.when.slice(0,10)]=1});
+  var t=new Date(),n=0;if(!days[dateKey(t)])t=new Date(Date.now()-864e5);
+  while(days[dateKey(t)]){n++;t=new Date(t.getTime()-864e5)}return{n:n,today:!!days[dateKey(new Date())],best:bestStreak(Object.keys(days).sort())};
+}
+function bestStreak(ds){var b=0,c=0,prev=null;ds.forEach(function(d){var t=new Date(d+'T00:00:00').getTime();c=(prev!==null&&Math.round((t-prev)/864e5)===1)?c+1:1;prev=t;if(c>b)b=c});return b}
+function statsOf(rs){
+  var s={xp:0,n:rs.length,pass:0,perfect:0,maxCombo:0,review:0,rangePass:0,days:{},vols:{}};
+  rs.forEach(function(r){s.xp+=xpOf(r);if(r.pass)s.pass++;if(r.pct===100&&r.total>=10)s.perfect++;s.maxCombo=Math.max(s.maxCombo,+r.combo||0);
+    if(r.mode==='review')s.review++;if(r.mode==='range'&&r.pass)s.rangePass++;
+    if(r.mode==='day'&&r.pass){s.days[r.v+'-'+r.d]=1;(s.vols[r.v]=s.vols[r.v]||{})[r.d]=1}});
+  s.dayPass=Object.keys(s.days).length;s.volDone=Object.keys(s.vols).filter(function(v){return Object.keys(s.vols[v]).length>=32}).length;
+  s.streak=streakOf(rs);s.level=levelOf(s.xp);return s;
+}
+var BADGES=[
+  ['first','첫 걸음','시험을 처음 끝까지 봤어요','1st',function(s){return s.n>=1}],
+  ['pass1','첫 합격','합격 도장을 처음 받았어요','OK',function(s){return s.pass>=1}],
+  ['perfect','만점','10문제 이상 시험에서 100점','100',function(s){return s.perfect>=1}],
+  ['perfect5','만점 수집가','만점 5번','×5',function(s){return s.perfect>=5}],
+  ['combo10','10 콤보','한 시험에서 10문제 연속 정답','C10',function(s){return s.maxCombo>=10}],
+  ['combo20','20 콤보','한 시험에서 20문제 연속 정답','C20',function(s){return s.maxCombo>=20}],
+  ['streak3','3일 연속','3일 동안 매일 시험','3일',function(s){return s.streak.best>=3}],
+  ['streak7','일주일 연속','7일 동안 매일 시험','7일',function(s){return s.streak.best>=7}],
+  ['streak30','한 달 연속','30일 동안 매일 시험','30일',function(s){return s.streak.best>=30}],
+  ['day10','DAY 10','DAY 시험 10개 합격','D10',function(s){return s.dayPass>=10}],
+  ['day50','DAY 50','DAY 시험 50개 합격','D50',function(s){return s.dayPass>=50}],
+  ['review5','복습왕','누적 복습 시험 5번','R5',function(s){return s.review>=5}],
+  ['range','범위 정복','범위 시험 합격','RNG',function(s){return s.rangePass>=1}],
+  ['vol1','한 호 완주','한 호의 DAY 32개 모두 합격','호',function(s){return s.volDone>=1}],
+  ['xp1000','1,000 XP','경험치 1,000 모으기','1K',function(s){return s.xp>=1000}],
+  ['xp5000','5,000 XP','경험치 5,000 모으기','5K',function(s){return s.xp>=5000}]
+];
+function earned(s){return BADGES.filter(function(b){return b[4](s)}).map(function(b){return b[0]})}
+function badgeHTML(b,on){return '<div class="badge'+(on?' on':'')+'" title="'+esc(b[2])+'"><span class="medal">'+esc(b[3])+'</span><b>'+esc(b[1])+'</b><small>'+esc(b[2])+'</small></div>'}
+function playerCard(s){
+  var L=s.level,pctBar=L.need?Math.round(L.into/L.need*100):100;
+  return '<div class="player"><div class="lvl"><span class="lvn">'+L.lv+'</span><span class="lvt">LEVEL</span></div>'+
+  '<div class="pinfo"><div class="row" style="justify-content:space-between;gap:6px"><b class="tier">'+L.tier+'</b><span class="xpn">'+s.xp.toLocaleString()+' XP</span></div>'+
+  '<div class="xpbar"><i style="width:'+pctBar+'%"></i></div><div class="row" style="justify-content:space-between;gap:6px"><span class="muted">'+(L.need?'다음 레벨까지 '+(L.need-L.into)+' XP':'최고 레벨')+'</span>'+
+  '<span class="flame'+(s.streak.today?' lit':'')+'">'+s.streak.n+'일 연속</span></div></div></div>'+
+  '<div class="row"><button class="btn small ghost" type="button" id="goBadges">배지 '+earned(s).length+' / '+BADGES.length+'</button>'+(store.mode==='academy'&&API_URL?'<button class="btn small ghost" type="button" id="goRank">우리 반 랭킹</button>':'')+'</div>';
+}
+function bindPlayer(){var b=document.getElementById('goBadges');if(b)b.onclick=function(){go('badges')};var r=document.getElementById('goRank');if(r)r.onclick=function(){go('rank')}}
+function vBadges(){
+  setCrumb('배지');var s=statsOf(myResults()),e={};earned(s).forEach(function(id){e[id]=1});
+  app.innerHTML='<div class="panel"><span class="eyebrow">Badges</span><h1>배지 모음</h1>'+playerCard(s)+'</div><div class="badges">'+BADGES.map(function(b){return badgeHTML(b,e[b[0]])}).join('')+'</div>';
+  bindPlayer();
+}
+function weekStart(){var t=new Date(),d=(t.getDay()+6)%7;t=new Date(t.getFullYear(),t.getMonth(),t.getDate()-d);return dateKey(t)}
+function vRank(){
+  setCrumb('우리 반 랭킹');
+  var h='<div class="panel"><span class="eyebrow">Weekly ranking</span><h1>'+esc(S.user?S.user.cls:'')+' 이번 주 랭킹</h1><p class="muted" style="margin:0">월요일부터 모은 XP 순위예요. 매주 월요일에 새로 시작해요.</p></div><div id="rankBody" class="panel"><p class="muted" style="margin:0">순위를 불러오는 중이에요…</p></div>';
+  app.innerHTML=h;
+  if(!API_URL||!S.user)return;
+  fetch(API_URL+'?action=rank&cls='+encodeURIComponent(S.user.cls)+'&since='+weekStart()).then(function(r){return r.json()}).then(function(res){
+    var el=document.getElementById('rankBody');if(!el)return;
+    if(!res||!res.ok||!res.rank){el.innerHTML='<p style="margin:0">랭킹을 불러오지 못했어요. 선생님께 시트 스크립트 업데이트를 확인해 달라고 해 주세요.</p>';return}
+    if(!res.rank.length){el.innerHTML='<p style="margin:0">이번 주에는 아직 시험 본 친구가 없어요. 첫 번째로 이름을 올려 보세요!</p>';return}
+    el.innerHTML='<div class="list">'+res.rank.map(function(x,i){var me=x.name===S.user.name;return '<div class="li rk'+(i<3?' top'+(i+1):'')+(me?' me':'')+'"><span class="rkn">'+(i+1)+'</span><span class="w">'+esc(x.name)+(me?' (나)':'')+'</span><span class="m">'+x.n+'회 시험</span><b class="xpn">'+x.xp.toLocaleString()+' XP</b></div>'}).join('')+'</div>';
+  }).catch(function(){var el=document.getElementById('rankBody');if(el)el.innerHTML='<p style="margin:0">인터넷 연결을 확인해 주세요.</p>'});
+}
+function floatXP(txt){var f=document.getElementById('fb');if(!f)return;var s=document.createElement('span');s.className='xpfloat';s.textContent=txt;f.appendChild(s)}
+
 /* ---------- views ---------- */
 function setCrumb(t){var u=store.mode==='academy'&&S.user?S.user.name+' · ':'';document.getElementById('crumb').textContent=u+(t||'')}
 function render(){
   if(!DATA)return;
-  var f={home:vHome,vol:vVol,day:vDay,quiz:vQuiz,result:vResult,wrong:vWrong,hist:vHist,teacher:vTeacher,range:vRange}[S.view];
-  if(store.mode==='academy'&&!S.user&&['vol','day','quiz','result','wrong','hist','range'].indexOf(S.view)>=0){S.view='home';f=vHome}
+  var f={home:vHome,vol:vVol,day:vDay,quiz:vQuiz,result:vResult,wrong:vWrong,hist:vHist,teacher:vTeacher,range:vRange,badges:vBadges,rank:vRank}[S.view];
+  if(store.mode==='academy'&&!S.user&&['vol','day','quiz','result','wrong','hist','range','badges','rank'].indexOf(S.view)>=0){S.view='home';f=vHome}
   f();window.scrollTo(0,0);
 }
 function go(view,extra){for(var k in extra)S[k]=extra[k];S.view=view;render()}
@@ -288,11 +401,12 @@ function vHome(){
   '<p class="muted" style="margin:0">호와 DAY를 골라 단어를 익히고, 스스로 시험을 보세요. 합격 기준은 DAY 시험 90%, 누적·범위 시험 85%예요.</p>';
   if(store.mode==='academy')h+='<div class="row" style="justify-content:space-between"><span><b>'+esc(S.user.name)+'</b> <span class="muted">'+esc(S.user.cls)+'</span></span><button class="btn small ghost" type="button" id="logout">학생 바꾸기</button></div></div>';
   else h+='<label class="muted" for="nameIn">내 이름 (시험 결과에 찍혀요)</label><div class="row"><input id="nameIn" type="text" placeholder="예: 김민준" value="'+esc(store.name)+'" style="flex:1"><button class="btn small" type="button" id="nameSave">저장</button></div></div>';
+  h+='<div class="panel">'+playerCard(statsOf(myResults()))+'</div>';
   h+='<div class="vols">';
   DATA.forEach(function(V){var st=volStats(V.v);
     h+='<button class="vol" type="button" data-vol="'+V.v+'"><span class="num">'+V.v+'호 · '+(V.days[0].w.length)+'단어 × 32 DAY</span><b>'+esc(V.n)+'</b><span class="bar"><i style="width:'+(st.pass/32*100)+'%"></i></span><span class="muted">합격 '+st.pass+' / 32</span></button>'});
   h+='</div>';
-  app.innerHTML=h;
+  app.innerHTML=h;bindPlayer();
   if(store.mode==='academy'){document.getElementById('logout').onclick=logout;return}
   var ni=document.getElementById('nameIn');
   function sv(){store.name=ni.value.trim();persist();document.getElementById('nameSave').textContent='저장됨'}
@@ -425,9 +539,9 @@ function vQuiz(){
   if(q.type==='d'){h+='<div class="prompt">'+esc(it.def)+'</div><span class="muted">이 영영풀이에 맞는 단어를 고르세요</span>'}
   if(q.type==='s'){h+='<div class="prompt">'+esc(it.mean)+'</div><span class="hint">'+esc(it.cls)+' · '+hintOf(q.answer)+'</span>'}
   if(q.type==='b'){var f=q.sent;h+='<div class="prompt sent">'+esc(f.s.slice(0,f.start))+'<span class="blank">'+(Q.locked?esc(f.ans):'&nbsp;')+'</span>'+esc(f.s.slice(f.end))+'</div><span class="hint">뜻: '+esc(shortMean(it.mean))+' · '+hintOf(q.answer)+' · 문장에 맞는 형태로 쓰세요</span>'}
-  if(q.opts){h+='<div class="opts">'+q.opts.map(function(o,i){return '<button class="opt" type="button" data-o="'+i+'">'+(i+1)+'. '+esc(o)+'</button>'}).join('')+'</div>'}
+  if(q.opts){h+='<div class="opts">'+q.opts.map(function(o,i){return '<button class="opt" type="button" data-o="'+i+'">'+'①②③④'.charAt(i)+' '+esc(o)+'</button>'}).join('')+'</div>'}
   else{h+='<form id="tf" class="row" autocomplete="off"><input id="ta" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" style="flex:1" placeholder="영어로 쓰세요"><button class="btn" type="submit">확인</button></form>'}
-  h+='<div id="fb"></div></div><div class="row" style="justify-content:space-between"><button class="btn ghost small" type="button" id="qQuit">그만하기</button><span class="muted">맞은 개수 '+Q.answers.filter(function(a){return a.ok}).length+'</span></div>';
+  h+='<div id="fb"></div></div><div class="row" style="justify-content:space-between"><button class="btn ghost small" type="button" id="qQuit">그만하기</button><span class="muted">맞은 개수 '+Q.answers.filter(function(a){return a.ok}).length+((Q.combo||0)>=2?' · <span class="combo'+(Q.combo>=10?' hot':'')+'">'+Q.combo+' COMBO</span>':'')+'</span></div>';
   app.innerHTML=h;Q.locked=false;
   document.getElementById('qQuit').onclick=function(){S.view=Q.back;render()};
   if(q.opts){app.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){answer(q.opts[+b.dataset.o],b)}})}
@@ -438,11 +552,13 @@ function answer(val,btn){
   var Q=S.quiz,q=Q.qs[Q.idx];if(Q.locked)return;Q.locked=true;
   var ok=q.opts?(val===q.answer):checkTyped(q,val);
   Q.answers.push({q:q,given:val,ok:ok});
+  var gainNow=0;if(ok){Q.combo=(Q.combo||0)+1;Q.maxCombo=Math.max(Q.maxCombo||0,Q.combo);
+    var cb=Q.mode==='retry'?0:(Q.combo>=10?6:Q.combo>=6?4:Q.combo>=3?2:0);Q.bonus=(Q.bonus||0)+cb;gainNow=(Q.mode==='retry'?5:10)+cb}else Q.combo=0;
   if(q.opts){app.querySelectorAll('.opt').forEach(function(b){b.disabled=true;var o=q.opts[+b.dataset.o];if(o===q.answer)b.classList.add('right');else if(b===btn)b.classList.add('wrong')})}
   else{document.getElementById('ta').readOnly=true;var bl=app.querySelector('.blank');if(bl)bl.textContent=q.answer}
   var fb=document.getElementById('fb');
-  fb.innerHTML='<div class="fb '+(ok?'ok':'no')+'">'+(ok?'정답!':'오답 · 정답: '+esc(q.answer))+'</div>'+(ok?'':'<div class="row" style="margin-top:10px"><button class="btn" type="button" id="qNext">다음 문제</button>'+spkBtn(q.it.word)+'</div>');
-  if(ok){setTimeout(next,650)}else{var nb=document.getElementById('qNext');nb.onclick=next;if(q.opts)nb.focus()}
+  fb.innerHTML='<div class="fb '+(ok?'ok':'no')+'">'+(ok?'정답!'+(Q.combo>=3?' <span class="combo'+(Q.combo>=10?' hot':'')+'">'+Q.combo+' COMBO</span>':''):'오답 · 정답: '+esc(q.answer))+'</div>'+(ok?'':'<div class="row" style="margin-top:10px"><button class="btn" type="button" id="qNext">다음 문제</button>'+spkBtn(q.it.word)+'</div>');
+  if(ok){floatXP('+'+gainNow+' XP');setTimeout(next,650)}else{var nb=document.getElementById('qNext');nb.onclick=next;if(q.opts)nb.focus()}
 }
 function next(){var Q=S.quiz;if(Q.adv===Q.idx)return;Q.adv=Q.idx;Q.idx++;if(Q.idx>=Q.qs.length)finish();else vQuiz()}
 function finish(){
@@ -451,14 +567,18 @@ function finish(){
   Q.answers.forEach(function(a){var k=a.q.it.key,w=U().wrong[k];
     if(a.ok){if(w){w.streak=(w.streak||0)+1;if(w.streak>=2)delete U().wrong[k]}}
     else{w=w||{n:0,streak:0};w.n++;w.streak=0;U().wrong[k]=w}});
+  var before=statsOf(myResults());
   var now=new Date(),r={name:who().name,cls:who().cls,v:Q.v,d:Q.d,mode:Q.mode,score:score,total:total,when:stamp(now),pct:pct,pass:pass};
   r.code=certCode(r);
+  var g={base:Q.mode==='retry'?score*5:score*10,combo:Q.mode==='retry'?0:(Q.bonus||0),pass:pass?50:0,perfect:(Q.mode!=='retry'&&pct===100&&total>=10)?50:0};
+  r.xp=g.base+g.combo+g.pass+g.perfect;r.combo=Q.maxCombo||0;
   if(Q.mode==='day'){var key=Q.v+'-'+Q.d,pr=U().prog[key]||{best:0,pass:false,tries:0};pr.tries++;pr.best=Math.max(pr.best,pct);if(pass)pr.pass=true;U().prog[key]=pr}
   store.hist.push(r);persist();
   if(API_URL){var o={};for(var k in r)o[k]=r[k];o.book=vol(r.v).n;o.dayLabel=dayLabel(r.d);o.modeName=MODE_NAME[r.mode];
     o.wrongWords=Q.answers.filter(function(a){return !a.ok}).map(function(a){return a.q.it.word});store.outbox.push(o);saveOutbox();
     S.sendState='sending';flush(function(ok){S.sendState=ok?'sent':'wait';var el=document.getElementById('sendSt');if(el)el.innerHTML=sendMsg()})}
-  S.result={r:r,answers:Q.answers,quiz:Q};go('result');
+  var after=statsOf(myResults()),eb={};earned(before).forEach(function(id){eb[id]=1});
+  S.result={r:r,answers:Q.answers,quiz:Q,gain:g,lvUp:after.level.lv>before.level.lv?after.level:null,newBadges:BADGES.filter(function(b){return b[4](after)&&!eb[b[0]]}),stats:after};go('result');
 }
 function sendMsg(){if(!API_URL)return '';return {sending:'<span class="muted">학원으로 결과를 보내는 중이에요…</span>',sent:'<span class="pill ok">학원으로 결과를 보냈어요</span>',wait:'<span class="pill no">인터넷이 연결되면 자동으로 다시 보내요</span>'}[S.sendState]||''}
 function vResult(){
@@ -467,11 +587,15 @@ function vResult(){
   var dl=String(r.d).indexOf('-')>0?'DAY '+r.d:'DAY '+pad(+r.d);
   var h='<div class="panel" style="align-items:center;text-align:center"><span class="eyebrow">'+MODE_NAME[r.mode]+'</span><div class="score">'+r.pct+'<span style="font-size:22px">%</span></div><div class="muted">'+r.total+'문제 중 '+r.score+'개 정답</div>'+
   (r.pass===null?'':'<span class="stamp '+(r.pass?'ok':'no')+'">'+(r.pass?'PASS 합격':'RETRY 재시험')+'</span>')+(API_URL?'<div id="sendSt">'+sendMsg()+'</div>':'')+'</div>';
+  var G=R.gain;if(G){h+='<div class="panel" style="align-items:center"><span class="eyebrow">Experience</span><div class="gain"><span>정답 '+r.score+'개</span><span>+'+G.base+'</span>'+(G.combo?'<span>콤보 보너스 (최대 '+r.combo+'연속)</span><span>+'+G.combo+'</span>':'')+(G.pass?'<span>합격 보너스</span><span>+'+G.pass+'</span>':'')+(G.perfect?'<span>만점 보너스</span><span>+'+G.perfect+'</span>':'')+'<span class="tot">획득 XP</span><span class="tot">+'+r.xp+'</span></div>'+
+    (R.lvUp?'<div class="lvup" style="width:100%">LEVEL UP!<b>LV '+R.lvUp.lv+' · '+R.lvUp.tier+'</b></div>':'')+
+    (R.newBadges&&R.newBadges.length?'<span class="eyebrow">새 배지</span><div class="newb">'+R.newBadges.map(function(b){return badgeHTML(b,true)}).join('')+'</div>':'')+
+    '<div style="width:100%">'+playerCard(R.stats)+'</div></div>'}
   h+='<div class="panel"><h2>선생님께 보여 주세요</h2><dl class="cert"><dt>이름</dt><dd>'+esc(r.name)+'</dd><dt>교재</dt><dd>'+r.v+'호 '+esc(vol(r.v).n)+' · '+dl+'</dd><dt>시험</dt><dd>'+MODE_NAME[r.mode]+'</dd><dt>점수</dt><dd>'+r.score+' / '+r.total+' ('+r.pct+'%)</dd><dt>일시</dt><dd>'+r.when+'</dd><dt>확인 코드</dt><dd class="code">'+r.code+'</dd></dl>'+
   '<p class="muted" style="margin:0">이 화면을 캡처해서 보내거나 선생님께 직접 보여 주세요. 확인 코드로 점수가 바뀌지 않았는지 확인할 수 있어요.</p></div>';
   if(wrongs.length){h+='<div class="panel"><h2>틀린 단어 '+wrongs.length+'개</h2><div class="list">'+wrongs.map(function(a){return '<div class="li"><span class="w">'+esc(a.q.it.word)+spkBtn(a.q.it.word)+'</span><span class="m">'+esc(shortMean(a.q.it.mean))+'<br>내 답: '+esc(a.given)+'</span></div>'}).join('')+'</div><p class="muted" style="margin:0">틀린 단어는 오답노트에 자동으로 들어가요. 연속 2번 맞히면 빠져요.</p></div>'}
   h+='<div class="row">'+(wrongs.length?'<button class="btn" type="button" id="rRetry">틀린 문제만 다시</button>':'')+'<button class="btn ghost" type="button" id="rAgain">같은 시험 다시</button><button class="btn ghost" type="button" id="rBack">돌아가기</button>'+(store.mode==='academy'?'<button class="btn ghost" type="button" id="rOut">시험 끝 · 학생 바꾸기</button>':'')+'</div>';
-  app.innerHTML=h;
+  app.innerHTML=h;bindPlayer();
   var Q=R.quiz;
   if(wrongs.length)document.getElementById('rRetry').onclick=function(){S.quiz={mode:'retry',v:Q.v,d:Q.d,qs:shuffle(wrongs.map(function(a){return makeQ(a.q.it,a.q.type)})),idx:0,answers:[],back:Q.back};go('quiz')};
   document.getElementById('rAgain').onclick=function(){S.quiz={mode:Q.mode,v:Q.v,d:Q.d,qs:assignTypes(Q.qs.map(function(x){return x.it})),idx:0,answers:[],back:Q.back};go('quiz')};
