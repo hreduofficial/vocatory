@@ -17,10 +17,10 @@
   --f-display:"YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --f-read:"Andika","YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --f-ui:"YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-  --f-hand:"YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-  --f-num:"YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-  --f-fun:"YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-  --f-sticker:"YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-hand:"Gaegu","Gamja Flower","YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"Fredoka","YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-fun:"Chewy","Jua","YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-sticker:"Jua","YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --r:24px;
 }
 *{box-sizing:border-box}
@@ -465,6 +465,16 @@ footer.foot .links{display:flex;gap:16px;justify-content:center;margin-top:10px}
 footer.foot .links button{background:none;border:0;color:#fff;opacity:.85;text-decoration:underline;font-size:15px}
 .toast{font-size:18px}
 @media (max-width:640px){.cert{font-size:15px}.typed input{font-size:24px!important}}
+
+/* font mix: YgJalnan is the main face; others add variety */
+.bubble{font-family:var(--f-hand);font-weight:700;font-size:22px;line-height:1.3}
+.bubble b,.bubble .combo{font-family:var(--f-ui);font-weight:400}
+.vol b,.stamp,.lvup,.lvup b,.qtag span.re{font-family:var(--f-fun);letter-spacing:.03em}
+.vol b{font-size:21px}
+.badge b,.stk .e~*,.rk .w,.pickgrid button{font-family:var(--f-sticker)}
+.qtag span,.tab .n,.pill{font-family:var(--f-num);font-weight:600}
+.muted,.qhint,.def{font-family:"Jua","YgJalnan","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+.panel h2{font-family:var(--f-fun);font-size:26px;letter-spacing:.02em}
 </style>
 
 <canvas id="fx"></canvas>
