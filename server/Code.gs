@@ -10,7 +10,7 @@
 var RESULT_SHEET = '결과';
 var ROSTER_SHEET = '명단';
 var CONFIG_SHEET = '설정';
-var RESULT_HEAD = ['일시', '반', '이름', '권', '교재', 'DAY', '시험 종류', '맞은 수', '문항 수', '점수(%)', '결과', '확인 코드', '틀린 단어', 'mode', 'd', '받은 시각'];
+var RESULT_HEAD = ['일시', '반', '이름', '호', '교재', 'DAY', '시험 종류', '맞은 수', '문항 수', '점수(%)', '결과', '확인 코드', '틀린 단어', 'mode', 'd', '받은 시각'];
 
 function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
