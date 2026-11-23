@@ -1,0 +1,643 @@
+<title>보카토리 스터디</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one narrow study column (max 640px), sticky teal header, workbook-style tables and tiles */
+:root{
+  --bg:#f3f6f5; --paper:#ffffff; --ink:#17302c; --muted:#5d716d; --line:#d5e0dd;
+  --teal:#0e6d62; --teal-ink:#ffffff; --teal-soft:#e2f0ed;
+  --ok:#1f8a4c; --ok-soft:#e3f4ea; --bad:#c2412d; --bad-soft:#fbe9e5; --gold:#c98a12;
+  --f-display:"Arial Black","Arial Bold",Arial,"Malgun Gothic",sans-serif;
+  --f-body:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1a18; --paper:#17252a; --ink:#e4efec; --muted:#9db3ae; --line:#2b3d3a;
+  --teal:#3fb8a6; --teal-ink:#06211d; --teal-soft:#1b3632;
+  --ok:#5cc98a; --ok-soft:#173326; --bad:#f07c66; --bad-soft:#3a1f1a; --gold:#e6b24a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1a18; --paper:#17252a; --ink:#e4efec; --muted:#9db3ae; --line:#2b3d3a;
+  --teal:#3fb8a6; --teal-ink:#06211d; --teal-soft:#1b3632;
+  --ok:#5cc98a; --ok-soft:#173326; --bad:#f07c66; --bad-soft:#3a1f1a; --gold:#e6b24a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--teal)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--teal);color:var(--teal-ink);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.hwrap{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.logo{font-family:var(--f-display);font-size:20px;letter-spacing:.04em;cursor:pointer;background:none;border:0;color:inherit;padding:0}
+.crumb{font-size:13px;opacity:.85;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbtn{background:transparent;border:1px solid currentColor;color:inherit;border-radius:6px;padding:4px 9px;font:inherit;font-size:13px;cursor:pointer}
+main{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px;display:flex;flex-direction:column;gap:16px}
+h1,h2{font-family:var(--f-display);color:var(--teal);margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:24px} h2{font-size:17px}
+.eyebrow{font-family:var(--f-display);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted);font-size:13px}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--teal);color:var(--teal-ink);border:0;border-radius:8px;padding:10px 16px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--teal);border:1.5px solid var(--teal)}
+.btn.small{padding:6px 11px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+input,select{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;min-width:0}
+input:focus,select:focus{border-color:var(--teal);outline:none}
+.vols{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.vol{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:6px}
+.vol b{font-family:var(--f-display);color:var(--teal);font-size:15px;letter-spacing:.03em}
+.vol .num{font-family:var(--f-display);font-size:12px;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--teal-soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal)}
+.days{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.day{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:9px 4px;text-align:center;color:var(--ink);display:flex;flex-direction:column;gap:2px;align-items:center}
+.day .dn{font-family:var(--f-display);font-size:14px;color:var(--teal)}
+.day .ds{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.day.pass{border-color:var(--ok);background:var(--ok-soft)}
+.day.pass .ds{color:var(--ok);font-weight:700}
+.day.tried .ds{color:var(--bad);font-weight:700}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);overflow-x:auto}
+.tab{background:none;border:0;padding:9px 12px;color:var(--muted);font-weight:700;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab.on{color:var(--teal);border-bottom-color:var(--teal)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{background:var(--teal);color:var(--teal-ink);font-size:12px;letter-spacing:.06em;padding:7px 8px;text-align:left;white-space:nowrap}
+td{border-top:1px solid var(--line);padding:7px 8px;vertical-align:top}
+td.no{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+td.w{font-weight:700;white-space:nowrap}
+td.cls{color:var(--muted);font-size:12px;white-space:nowrap}
+.def{color:var(--muted);font-size:13px;margin-top:3px}
+.hidecol{color:transparent!important;background:var(--teal-soft);border-radius:4px;cursor:pointer;user-select:none}
+.hidecol *{visibility:hidden}
+.spk{background:none;border:0;color:var(--teal);padding:0 4px;font-size:15px;vertical-align:middle}
+.card{background:var(--paper);border:2px solid var(--teal);border-radius:14px;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;text-align:center;cursor:pointer;user-select:none}
+.card .big{font-family:var(--f-display);font-size:30px;color:var(--teal);word-break:break-word}
+.card .mean{font-size:19px;font-weight:700;white-space:pre-line}
+.card .def{color:var(--muted)}
+.sent{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.sent:first-child{border-top:0}
+.sent .n{font-family:var(--f-display);color:var(--teal);font-size:12px;padding-top:3px;min-width:18px}
+.sent p{margin:0;flex:1;min-width:0;font-size:16px}
+mark{background:var(--teal-soft);color:var(--teal);font-weight:700;border-radius:3px;padding:0 2px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.qtype{font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-soft);border-radius:20px;padding:3px 10px}
+.prompt{font-size:20px;font-weight:700;white-space:pre-line;word-break:break-word}
+.prompt.en{font-family:var(--f-display);font-size:28px;color:var(--teal);font-weight:400}
+.prompt.sent{font-size:18px;font-weight:400;display:block;border:0;padding:0}
+.blank{display:inline-block;min-width:70px;border-bottom:2px solid var(--teal);color:var(--teal);font-weight:700}
+.hint{font-size:13px;color:var(--muted)}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:11px 13px;color:var(--ink);white-space:pre-line}
+.opt:hover:not(:disabled){border-color:var(--teal)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{border-radius:8px;padding:10px 12px;font-weight:700}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.prog{height:8px;border-radius:4px;background:var(--teal-soft);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--teal);transition:width .2s}
+.score{font-family:var(--f-display);font-size:46px;color:var(--teal);line-height:1;font-variant-numeric:tabular-nums}
+.stamp{font-family:var(--f-display);font-size:16px;letter-spacing:.1em;border:3px solid currentColor;border-radius:8px;padding:4px 12px;transform:rotate(-4deg);display:inline-block}
+.stamp.ok{color:var(--ok)} .stamp.no{color:var(--bad)}
+.cert{border:2px dashed var(--teal);border-radius:10px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.cert dt{color:var(--muted)} .cert dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.code{font-family:"Courier New",monospace;font-size:20px;letter-spacing:.18em;color:var(--teal)}
+.list{display:flex;flex-direction:column}
+.li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:baseline}
+.li:first-child{border-top:0}
+.li .w{font-weight:700;min-width:0;flex:0 1 40%;word-break:break-word}
+.li .m{flex:1;min-width:0;color:var(--muted);font-size:13px;white-space:pre-line}
+.pill{font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.no{background:var(--bad-soft);color:var(--bad)}
+.formula{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;font-size:12px}
+.formula div{background:var(--teal-soft);border-radius:6px;padding:6px 2px;color:var(--teal);font-weight:700}
+.formula small{display:block;color:var(--muted);font-weight:400}
+footer{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 30px;display:flex;gap:14px;justify-content:center}
+footer button{background:none;border:0;color:var(--muted);font-size:12px;text-decoration:underline}
+@media (min-width:520px){.vols{grid-template-columns:repeat(3,1fr)}.days{grid-template-columns:repeat(8,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header><div class="hwrap">
+  <button class="logo" id="logo" type="button">VOCATORY</button>
+  <span class="crumb" id="crumb"></span>
+  <button class="hbtn" id="btnWrong" type="button">오답노트</button>
+</div></header>
+<main id="app"><div class="panel"><p class="muted">단어 데이터를 불러오는 중이에요…</p></div></main>
+<footer>
+  <button type="button" id="lnkHist">내 시험 기록</button>
+  <button type="button" id="lnkTeacher">선생님</button>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var DATA=null, S={view:'home'}, app=document.getElementById('app');
+var SALT='HSJ-VOCATORY-2026';
+var PASS={day:90,review:85,range:85,wrong:0,retry:90};
+var MODE_NAME={day:'DAY 시험',review:'누적 복습 시험',range:'범위 시험',wrong:'오답노트 시험',retry:'틀린 문제 재시험'};
+var TYPE_NAME={m:'영어 → 뜻',s:'뜻 → 영어 쓰기',d:'영영풀이 → 단어',b:'Target Sentence 빈칸'};
+
+/* ---------- storage ---------- */
+var mem={};
+function load(k,def){try{var v=localStorage.getItem('voca.'+k);return v?JSON.parse(v):def}catch(e){return k in mem?mem[k]:def}}
+function save(k,v){mem[k]=v;try{localStorage.setItem('voca.'+k,JSON.stringify(v))}catch(e){}}
+var store={mode:load('mode','personal'),pin:load('pin','0000'),roster:load('roster',[]),users:load('users',{}),name:load('name',''),me:{prog:load('prog',{}),wrong:load('wrong',{})},hist:load('hist',[])};
+function persist(){save('mode',store.mode);save('pin',store.pin);save('roster',store.roster);save('users',store.users);save('name',store.name);save('prog',store.me.prog);save('wrong',store.me.wrong);save('hist',store.hist.slice(-5000))}
+var GUEST={prog:{},wrong:{}};
+function U(){if(store.mode!=='academy')return store.me;if(!S.user)return GUEST;var u=store.users[S.user.key];if(!u)u=store.users[S.user.key]={prog:{},wrong:{}};return u}
+var API_URL=''; /*API_URL*/
+store.outbox=load('outbox',[]);
+function saveOutbox(){save('outbox',store.outbox)}
+function sinceStr(){var t=new Date(Date.now()-183*864e5);return t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate())}
+function api(params){if(params.action==='results')params.since=sinceStr();var q=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k])}).join('&');return fetch(API_URL+'?'+q).then(function(r){return r.json()})}
+function apiPost(body){return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()})}
+var flushing=false;
+function flush(cb){
+  if(!API_URL||flushing||!store.outbox.length){if(cb)cb(!store.outbox.length);return}
+  flushing=true;var batch=store.outbox.slice(0,30);
+  apiPost({action:'result',results:batch}).then(function(res){flushing=false;
+    if(res&&res.ok){var done={};res.saved.forEach(function(c){done[c]=1});store.outbox=store.outbox.filter(function(r){return !done[r.code]});saveOutbox();if(store.outbox.length)return flush(cb)}
+    if(cb)cb(!store.outbox.length)}).catch(function(){flushing=false;if(cb)cb(false)});
+}
+function loadRoster(cb){if(!API_URL){if(cb)cb();return}S.rosterLoading=true;
+  api({action:'roster'}).then(function(res){S.rosterLoading=false;if(res&&res.ok){store.roster=res.roster;persist()}if(cb)cb()}).catch(function(){S.rosterLoading=false;if(cb)cb()})}
+function loadMine(u){if(!API_URL)return;api({action:'mine',cls:u.cls,name:u.name}).then(function(res){if(!res||!res.ok)return;
+  var P=store.users[u.key]||(store.users[u.key]={prog:{},wrong:{}});
+  res.results.forEach(function(r){var k=r.v+'-'+r.d,pr=P.prog[k]||{best:0,pass:false,tries:0};pr.best=Math.max(pr.best,r.pct);if(r.pass)pr.pass=true;P.prog[k]=pr});
+  persist();if(S.user&&S.user.key===u.key&&(S.view==='home'||S.view==='vol'))render()}).catch(function(){})}
+function who(){return store.mode==='academy'&&S.user?S.user:{name:store.name||'(이름 없음)',cls:''}}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function pad(n){return (n<10?'0':'')+n}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function vol(v){return DATA[v-1]}
+function dayObj(v,d){return vol(v).days[d-1]}
+function W(v,d,i){var w=dayObj(v,d).w[i];return{v:v,d:d,i:i,key:v+'-'+d+'-'+i,word:w[0],cls:w[1],mean:w[2],def:w[3]}}
+function dayWords(v,d){return dayObj(v,d).w.map(function(_,i){return W(v,d,i)})}
+function norm(s){return String(s).toLowerCase().replace(/[’‘`]/g,"'").replace(/[~.,!?;:"()\[\]]/g,' ').replace(/\s+/g,' ').trim()}
+function stamp(t){return t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate())+' '+pad(t.getHours())+':'+pad(t.getMinutes())}
+function hashCode(str){var h=2166136261>>>0,h2=5381;for(var i=0;i<str.length;i++){var c=str.charCodeAt(i);h^=c;h=Math.imul(h,16777619)>>>0;h2=(Math.imul(h2,33)+c)>>>0}
+  var A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',out='',x=(h^(h2<<7))>>>0,y=h2;for(var k=0;k<6;k++){var src=k<3?x:y;out+=A[src%32];if(k<3)x=Math.floor(x/32);else y=Math.floor(y/32)}return out}
+function certCode(r){return hashCode([r.name.trim(),r.v,r.d,r.mode,r.score,r.total,r.when,SALT].join('|'))}
+function shortMean(m){return m.replace(/\(\([^)]*\)\)/g,'').replace(/\s+/g,' ').trim()}
+var synthOK='speechSynthesis' in window;
+function speak(t){if(!synthOK)return;try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t.replace(/~/g,'').replace(/\bone's\b/g,"one's"));u.lang='en-US';u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+function spkBtn(t){return synthOK?'<button class="spk" type="button" data-say="'+esc(t)+'" aria-label="발음 듣기">🔊</button>':''}
+
+/* ---------- finding a word inside a Target Sentence ---------- */
+var BE='(?:be|am|is|are|was|were|been|being)';
+function formsRe(t){
+  if(t==='be')return BE;
+  if(/^(one's|someone's|someone|something|one|sb|sth|a|the)$/.test(t)&&t!=='a'&&t!=='the')return "[a-z']+";
+  var w=t.replace(/[^a-z'-]/g,'');if(!w)return null;
+  var f=[w,w+'s',w+'es',w+'ed',w+'d',w+'ing',w+'er',w+'est',w+'ly'];
+  if(/e$/.test(w))f.push(w.slice(0,-1)+'ing');
+  if(/y$/.test(w)){var r=w.slice(0,-1);f.push(r+'ies',r+'ied',r+'ier',r+'iest',r+'ily')}
+  if(/[^aeiou][aeiou][bdgklmnprt]$/.test(w)){var l=w.slice(-1);f.push(w+l+'ed',w+l+'ing',w+l+'er',w+l+'est')}
+  f.sort(function(a,b){return b.length-a.length});
+  return '(?:'+f.map(function(x){return x.replace(/[-']/g,'\\$&')}).join('|')+')';
+}
+var findCache={};
+function findInSent(v,d,word){
+  var k=v+'|'+d+'|'+word;if(k in findCache)return findCache[k];
+  var toks=word.toLowerCase().replace(/[~()]/g,' ').replace(/\//g,' ').split(/\s+/).filter(Boolean),parts=[];
+  for(var i=0;i<toks.length;i++){var p=formsRe(toks[i]);if(p)parts.push(p)}
+  var res=null;
+  if(parts.length){
+    var re=new RegExp("(^|[^A-Za-z'])("+parts.join("[\\s,]+")+")(?![A-Za-z])","i");
+    var ss=dayObj(v,d).s;
+    for(var j=0;j<ss.length;j++){var m=re.exec(ss[j]);if(m){var st=m.index+m[1].length;res={s:ss[j],start:st,end:st+m[2].length,ans:m[2]};break}}
+  }
+  findCache[k]=res;return res;
+}
+function highlightSent(v,d,s){
+  var ranges=[];dayObj(v,d).w.forEach(function(w){var f=findInSent(v,d,w[0]);if(f&&f.s===s)ranges.push([f.start,f.end])});
+  ranges.sort(function(a,b){return a[0]-b[0]});var out='',pos=0;
+  ranges.forEach(function(r){if(r[0]<pos)return;out+=esc(s.slice(pos,r[0]))+'<mark>'+esc(s.slice(r[0],r[1]))+'</mark>';pos=r[1]});
+  return out+esc(s.slice(pos));
+}
+
+/* ---------- building tests ---------- */
+function pickMeanOpts(it){
+  var pool=[],seen={};seen[shortMean(it.mean)]=1;
+  var same=dayWords(it.v,it.d).filter(function(x){return x.i!==it.i});
+  var vv=vol(it.v),near=[];
+  for(var k=0;k<6;k++){var dd=Math.max(1,Math.min(32,it.d+(k<3?-k-1:k-2)));if(dd!==it.d)near=near.concat(dayWords(it.v,dd))}
+  [shuffle(same),shuffle(near)].forEach(function(arr){arr.forEach(function(x){var m=shortMean(x.mean);if(pool.length<3&&!seen[m]&&x.word!==it.word){seen[m]=1;pool.push(m)}})});
+  return shuffle(pool.concat([shortMean(it.mean)]));
+}
+function pickWordOpts(it){
+  var pool=[],seen={};seen[it.word.toLowerCase()]=1;
+  var cand=shuffle(dayWords(it.v,it.d)).concat(shuffle(dayWords(it.v,it.d<32?it.d+1:it.d-1)));
+  cand.forEach(function(x){var k=x.word.toLowerCase();if(pool.length<3&&!seen[k]){seen[k]=1;pool.push(x.word)}});
+  return shuffle(pool.concat([it.word]));
+}
+function makeQ(it,type){
+  var q={it:it,type:type};
+  if(type==='b'){var f=findInSent(it.v,it.d,it.word);if(!f){type='d';q.type='d'}else{q.sent=f;q.answer=f.ans}}
+  if(type==='m'){q.opts=pickMeanOpts(it);q.answer=shortMean(it.mean)}
+  if(type==='d'){q.opts=pickWordOpts(it);q.answer=it.word}
+  if(type==='s'){q.answer=it.word}
+  return q;
+}
+function assignTypes(items){
+  var n=items.length,nb=Math.round(n*.2),nd=Math.round(n*.2),ns=Math.round(n*.3),nm=n-nb-nd-ns;
+  var withS=shuffle(items.filter(function(it){return findInSent(it.v,it.d,it.word)})),
+      rest=shuffle(items.filter(function(it){return !findInSent(it.v,it.d,it.word)}));
+  var b=withS.slice(0,nb),left=shuffle(withS.slice(nb).concat(rest)),qs=[];
+  b.forEach(function(it){qs.push(makeQ(it,'b'))});
+  var need=[['s',ns],['d',nd+(nb-b.length)],['m',nm]],p=0;
+  need.forEach(function(t){for(var k=0;k<t[1]&&p<left.length;k++)qs.push(makeQ(left[p++],t[0]))});
+  while(p<left.length)qs.push(makeQ(left[p++],'m'));
+  return shuffle(qs);
+}
+function takeRandom(arr,n,used){var out=[];shuffle(arr).forEach(function(x){if(out.length<n&&!used[x.key]){used[x.key]=1;out.push(x)}});return out}
+function buildReview(v,d){
+  var used={},total=20,items=[];
+  var cur=takeRandom(dayWords(v,d),12,used);items=items.concat(cur);
+  if(d-3>=1)items=items.concat(takeRandom(dayWords(v,d-3),3,used));
+  if(d-7>=1)items=items.concat(takeRandom(dayWords(v,d-7),3,used));
+  var wr=Object.keys(U().wrong).filter(function(k){return +k.split('-')[0]===v&&+k.split('-')[1]<=d}).map(function(k){var a=k.split('-');return W(+a[0],+a[1],+a[2])});
+  items=items.concat(takeRandom(wr,2,used));
+  var back=[];for(var x=d;x>=1;x--)back=back.concat(dayWords(v,x));
+  if(items.length<total)items=items.concat(takeRandom(back,total-items.length,used));
+  return items;
+}
+
+/* ---------- views ---------- */
+function setCrumb(t){var u=store.mode==='academy'&&S.user?S.user.name+' · ':'';document.getElementById('crumb').textContent=u+(t||'')}
+function render(){
+  if(!DATA)return;
+  var f={home:vHome,vol:vVol,day:vDay,quiz:vQuiz,result:vResult,wrong:vWrong,hist:vHist,teacher:vTeacher,range:vRange}[S.view];
+  if(store.mode==='academy'&&!S.user&&['vol','day','quiz','result','wrong','hist','range'].indexOf(S.view)>=0){S.view='home';f=vHome}
+  f();window.scrollTo(0,0);
+}
+function go(view,extra){for(var k in extra)S[k]=extra[k];S.view=view;render()}
+
+function volStats(v){var p=0,t=0;vol(v).days.forEach(function(_,i){var r=U().prog[v+'-'+(i+1)];if(r){t++;if(r.pass)p++}});return{pass:p,tried:t}}
+
+function vHome(){
+  setCrumb('');
+  if(store.mode==='academy'&&!S.user){vPick();return}
+  var h='<div class="panel"><span class="eyebrow">Self study · Self test</span><h1>보카토리 단어 공부</h1>'+
+  '<p class="muted" style="margin:0">권과 DAY를 골라 단어를 익히고, 스스로 시험을 보세요. 합격 기준은 DAY 시험 90%, 누적·범위 시험 85%예요.</p>';
+  if(store.mode==='academy')h+='<div class="row" style="justify-content:space-between"><span><b>'+esc(S.user.name)+'</b> <span class="muted">'+esc(S.user.cls)+'</span></span><button class="btn small ghost" type="button" id="logout">학생 바꾸기</button></div></div>';
+  else h+='<label class="muted" for="nameIn">내 이름 (시험 결과에 찍혀요)</label><div class="row"><input id="nameIn" type="text" placeholder="예: 김민준" value="'+esc(store.name)+'" style="flex:1"><button class="btn small" type="button" id="nameSave">저장</button></div></div>';
+  h+='<div class="vols">';
+  DATA.forEach(function(V){var st=volStats(V.v);
+    h+='<button class="vol" type="button" data-vol="'+V.v+'"><span class="num">'+V.v+'권 · '+(V.days[0].w.length)+'단어 × 32 DAY</span><b>'+esc(V.n)+'</b><span class="bar"><i style="width:'+(st.pass/32*100)+'%"></i></span><span class="muted">합격 '+st.pass+' / 32</span></button>'});
+  h+='</div>';
+  app.innerHTML=h;
+  if(store.mode==='academy'){document.getElementById('logout').onclick=logout;return}
+  var ni=document.getElementById('nameIn');
+  function sv(){store.name=ni.value.trim();persist();document.getElementById('nameSave').textContent='저장됨'}
+  document.getElementById('nameSave').onclick=sv;ni.onchange=sv;
+}
+function logout(){S.user=null;S.pickCls=null;go('home')}
+function vPick(){
+  var h='<div class="panel"><span class="eyebrow">Academy mode</span><h1>누구예요?</h1>';
+  if(!store.roster.length){app.innerHTML=h+'<p style="margin:0">'+(S.rosterLoading?'반·학생 명단을 불러오는 중이에요…':'아직 반·학생 명단이 없어요. 선생님이 아래 "선생님" 화면에서 명단을 먼저 넣어 주세요.')+'</p></div>';return}
+  if(!S.pickCls){h+='<p class="muted" style="margin:0">내 반을 고르세요.</p></div><div class="vols">'+store.roster.map(function(r,i){return '<button class="vol" type="button" data-pc="'+i+'"><b>'+esc(r.c)+'</b><span class="muted">'+r.n.length+'명</span></button>'}).join('')+'</div>'}
+  else{var r=store.roster[S.pickCls-1];h+='<p class="muted" style="margin:0">'+esc(r.c)+' · 내 이름을 고르세요.</p></div><div class="days" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr))">'+r.n.map(function(n,i){return '<button class="day" type="button" data-pn="'+i+'" style="padding:14px 6px"><span class="dn" style="font-family:var(--f-body);font-weight:700">'+esc(n)+'</span></button>'}).join('')+'</div><div class="row"><button class="btn ghost small" type="button" id="pcBack">◀ 반 다시 고르기</button></div>'}
+  app.innerHTML=h;
+  app.querySelectorAll('[data-pc]').forEach(function(b){b.onclick=function(){S.pickCls=+b.dataset.pc+1;render()}});
+  app.querySelectorAll('[data-pn]').forEach(function(b){b.onclick=function(){var r=store.roster[S.pickCls-1],n=r.n[+b.dataset.pn];S.user={key:r.c+'|'+n,cls:r.c,name:n};loadMine(S.user);go('home')}});
+  var pb=document.getElementById('pcBack');if(pb)pb.onclick=function(){S.pickCls=null;render()};
+}
+
+function vVol(){
+  var V=vol(S.v);setCrumb(S.v+'권 '+V.n);
+  var h='<div class="panel"><span class="eyebrow">'+S.v+'권</span><h1>'+esc(V.n)+'</h1><p class="muted" style="margin:0">DAY를 누르면 단어 목록, 카드, Target Sentence, 시험으로 들어가요. 초록색은 합격한 DAY예요.</p></div>';
+  h+='<div class="days">';
+  V.days.forEach(function(D){var r=U().prog[S.v+'-'+D.d];var cls=r?(r.pass?'pass':'tried'):'';
+    h+='<button class="day '+cls+'" type="button" data-day="'+D.d+'"><span class="dn">'+pad(D.d)+'</span><span class="ds">'+(r?r.best+'%':'DAY')+'</span></button>'});
+  h+='</div><div class="panel"><h2>범위 시험</h2><p class="muted" style="margin:0">여러 DAY를 묶어서 시험 봐요. 4 DAY마다 한 번, 16·32 DAY에 중간·종합 시험으로 쓰세요.</p><div class="row"><button class="btn ghost" type="button" id="goRange">범위 정하기</button></div></div>';
+  app.innerHTML=h;
+  document.getElementById('goRange').onclick=function(){go('range',{rf:1,rt:Math.min(32,4),rn:30})};
+}
+
+function vRange(){
+  var V=vol(S.v);setCrumb(S.v+'권 '+V.n+' · 범위 시험');
+  var opt='';for(var i=1;i<=32;i++)opt+='<option value="'+i+'">DAY '+pad(i)+'</option>';
+  app.innerHTML='<div class="panel"><span class="eyebrow">'+S.v+'권 '+esc(V.n)+'</span><h1>범위 시험</h1>'+
+  '<div class="row"><select id="rf" aria-label="시작 DAY">'+opt+'</select><span>부터</span><select id="rt" aria-label="끝 DAY">'+opt+'</select><span>까지</span></div>'+
+  '<div class="row"><label for="rn">문항 수</label><select id="rn"><option>20</option><option>30</option><option>50</option><option>100</option></select></div>'+
+  '<div class="row" style="gap:6px"><button class="btn small ghost" type="button" data-preset="1-4">DAY 1–4</button><button class="btn small ghost" type="button" data-preset="1-16">중간 1–16</button><button class="btn small ghost" type="button" data-preset="17-32">17–32</button><button class="btn small ghost" type="button" data-preset="1-32">종합 1–32</button></div>'+
+  '<p class="muted" style="margin:0">출제 비율: 영어→뜻 30%, 뜻→영어 쓰기 30%, 영영풀이 20%, Target Sentence 빈칸 20% · 합격 85%</p>'+
+  '<div class="row"><button class="btn" type="button" id="rgo">시험 시작</button><button class="btn ghost" type="button" id="rback">돌아가기</button></div></div>';
+  var rf=document.getElementById('rf'),rt=document.getElementById('rt'),rn=document.getElementById('rn');
+  rf.value=S.rf;rt.value=S.rt;rn.value=S.rn;
+  app.querySelectorAll('[data-preset]').forEach(function(b){b.onclick=function(){var a=b.dataset.preset.split('-');rf.value=a[0];rt.value=a[1];rn.value=(a[1]-a[0]>8)?50:30}});
+  document.getElementById('rback').onclick=function(){go('vol')};
+  document.getElementById('rgo').onclick=function(){
+    var a=+rf.value,b=+rt.value;if(a>b){var t=a;a=b;b=t}
+    S.rf=a;S.rt=b;S.rn=+rn.value;
+    var all=[];for(var x=a;x<=b;x++)all=all.concat(dayWords(S.v,x));
+    var items=shuffle(all).slice(0,Math.min(S.rn,all.length));
+    startQuiz('range',S.v,a===b?String(a):(a+'-'+b),items);
+  };
+}
+
+function vDay(){
+  var V=vol(S.v),D=dayObj(S.v,S.d);setCrumb(S.v+'권 '+V.n+' · DAY '+pad(S.d));
+  S.tab=S.tab||'list';
+  var r=U().prog[S.v+'-'+S.d];
+  var h='<div class="panel" style="gap:8px"><div class="row" style="justify-content:space-between"><div><span class="eyebrow">'+S.v+'권 '+esc(V.n)+'</span><h1>DAY '+pad(S.d)+'</h1></div>'+
+  (r?'<span class="pill '+(r.pass?'ok':'no')+'">'+(r.pass?'합격':'재시험 필요')+' · 최고 '+r.best+'%</span>':'<span class="pill no" style="opacity:.7">시험 전</span>')+
+  '</div><div class="row"><button class="btn small ghost" type="button" id="prevD"'+(S.d<=1?' disabled':'')+'>◀ 이전 DAY</button><button class="btn small ghost" type="button" id="nextD"'+(S.d>=32?' disabled':'')+'>다음 DAY ▶</button></div></div>';
+  h+='<div class="tabs" role="tablist">'+[['list','단어 목록'],['card','단어 카드'],['sent','Target Sentence'],['test','시험 보기']].map(function(t){return '<button class="tab'+(S.tab===t[0]?' on':'')+'" type="button" data-tab="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+  h+='<div id="tabBody"></div>';
+  app.innerHTML=h;
+  document.getElementById('prevD').onclick=function(){go('day',{d:S.d-1,ci:0})};
+  document.getElementById('nextD').onclick=function(){go('day',{d:S.d+1,ci:0})};
+  var tb=document.getElementById('tabBody');
+  ({list:tList,card:tCard,sent:tSent,test:tTest})[S.tab](tb,D);
+}
+function tList(tb,D){
+  S.hide=S.hide||{};
+  var h='<div class="row" style="margin-bottom:8px"><span class="muted">가리고 외우기:</span><button class="btn small ghost" type="button" data-hide="w">'+(S.hide.w?'단어 보이기':'단어 가리기')+'</button><button class="btn small ghost" type="button" data-hide="m">'+(S.hide.m?'뜻 보이기':'뜻 가리기')+'</button></div>';
+  h+='<div class="tbl-wrap"><table><thead><tr><th>NO.</th><th>WORD</th><th>CLASS</th><th>MEANING · DEFINITION</th></tr></thead><tbody>';
+  var base=(S.d-1)*D.w.length;
+  D.w.forEach(function(w,i){h+='<tr><td class="no">'+String(base+i+1).padStart(3,'0')+'</td><td class="w'+(S.hide.w?' hidecol':'')+'">'+esc(w[0])+spkBtn(w[0])+'</td><td class="cls">'+esc(w[1])+'</td><td class="'+(S.hide.m?'hidecol':'')+'"><span style="white-space:pre-line">'+esc(w[2])+'</span><div class="def">'+esc(w[3])+'</div></td></tr>'});
+  h+='</tbody></table></div><p class="muted">가린 칸을 누르면 그 칸만 잠깐 보여요.</p>';
+  tb.innerHTML=h;
+  tb.querySelectorAll('[data-hide]').forEach(function(b){b.onclick=function(){S.hide[b.dataset.hide]=!S.hide[b.dataset.hide];tList(tb,D)}});
+  tb.querySelectorAll('.hidecol').forEach(function(c){c.onclick=function(){c.classList.toggle('hidecol')}});
+}
+function tCard(tb,D){
+  S.ci=S.ci||0;if(S.ci>=D.w.length)S.ci=0;
+  var it=W(S.v,S.d,S.ci),flip=!!S.flip;
+  tb.innerHTML='<div style="display:flex;flex-direction:column;gap:12px"><div class="muted" style="text-align:center">'+(S.ci+1)+' / '+D.w.length+' · 카드를 누르면 뒤집혀요</div>'+
+  '<div class="card" id="card" role="button" tabindex="0">'+(flip?'<span class="muted">'+esc(it.word)+' · '+esc(it.cls)+'</span><span class="mean">'+esc(it.mean)+'</span><span class="def">'+esc(it.def)+'</span>':'<span class="big">'+esc(it.word)+'</span><span class="muted">'+esc(it.cls)+'</span>')+'</div>'+
+  '<div class="row" style="justify-content:center"><button class="btn ghost small" type="button" id="cPrev">◀ 이전</button>'+(synthOK?'<button class="btn ghost small" type="button" id="cSay">🔊 발음</button>':'')+'<button class="btn ghost small" type="button" id="cNext">다음 ▶</button></div>'+
+  '<div class="row" style="justify-content:center"><button class="btn small" type="button" id="cKnow">알아요</button><button class="btn small" type="button" id="cDont" style="background:var(--bad)">헷갈려요 (오답노트로)</button></div>'+
+  '<p class="muted" style="text-align:center;margin:0">'+(U().wrong[it.key]?'이 단어는 오답노트에 있어요.':'')+'</p></div>';
+  function mv(k){S.ci=(S.ci+k+D.w.length)%D.w.length;S.flip=false;tCard(tb,D)}
+  var card=document.getElementById('card');
+  card.onclick=function(){S.flip=!S.flip;tCard(tb,D)};
+  card.onkeydown=function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();card.onclick()}};
+  document.getElementById('cPrev').onclick=function(){mv(-1)};
+  document.getElementById('cNext').onclick=function(){mv(1)};
+  if(synthOK)document.getElementById('cSay').onclick=function(){speak(it.word)};
+  document.getElementById('cKnow').onclick=function(){mv(1)};
+  document.getElementById('cDont').onclick=function(){var w=U().wrong[it.key]||{n:0,streak:0};w.n++;w.streak=0;U().wrong[it.key]=w;persist();mv(1)};
+}
+function tSent(tb,D){
+  var h='<div class="panel"><h2>TARGET SENTENCE</h2><p class="muted" style="margin:0">오늘 단어로만 만든 스토리 문장이에요. 색칠된 부분이 오늘 단어예요.</p><div>';
+  D.s.forEach(function(s,i){h+='<div class="sent"><span class="n">'+(i+1)+'</span><p>'+highlightSent(S.v,S.d,s)+'</p>'+spkBtn(s)+'</div>'});
+  h+='</div></div>';tb.innerHTML=h;
+}
+function tTest(tb,D){
+  var n=D.w.length,nb=Math.round(n*.2),nd=Math.round(n*.2),ns=Math.round(n*.3),nm=n-nb-nd-ns;
+  var revOK=S.d>=2;
+  tb.innerHTML='<div style="display:flex;flex-direction:column;gap:12px"><div class="panel"><h2>DAY '+pad(S.d)+' 시험</h2><p class="muted" style="margin:0">오늘 단어 '+n+'개 전부 나와요. 90% 이상이면 합격이고, 미만이면 바로 재시험이에요.</p>'+
+  '<div class="formula"><div>'+nm+'<small>영어→뜻</small></div><div>'+ns+'<small>뜻→영어 쓰기</small></div><div>'+nd+'<small>영영풀이</small></div><div>'+nb+'<small>문장 빈칸</small></div></div>'+
+  '<div class="row"><button class="btn" type="button" id="tDay">DAY 시험 시작</button></div></div>'+
+  '<div class="panel"><h2>누적 복습 시험</h2><p class="muted" style="margin:0">20문항. 잊기 전에 다시 꺼내 보도록 섞어서 내요. 합격 85%.</p>'+
+  '<div class="formula"><div>60%<small>오늘 DAY</small></div><div>15%<small>3 DAY 전</small></div><div>15%<small>7 DAY 전</small></div><div>10%<small>오답노트</small></div></div>'+
+  '<div class="row"><button class="btn ghost" type="button" id="tRev"'+(revOK?'':' disabled')+'>누적 복습 시험 시작</button>'+(revOK?'':'<span class="muted">DAY 02부터 볼 수 있어요</span>')+'</div></div></div>';
+  document.getElementById('tDay').onclick=function(){startQuiz('day',S.v,String(S.d),dayWords(S.v,S.d))};
+  if(revOK)document.getElementById('tRev').onclick=function(){startQuiz('review',S.v,String(S.d),buildReview(S.v,S.d))};
+}
+
+/* ---------- quiz ---------- */
+function startQuiz(mode,v,dLabel,items){
+  if(!items.length){return}
+  S.quiz={mode:mode,v:v,d:dLabel,qs:assignTypes(items),idx:0,answers:[],back:S.view==='wrong'?'wrong':(mode==='range'?'vol':'day')};
+  go('quiz');
+}
+function checkTyped(q,val){
+  var a=norm(val);if(!a)return false;
+  var t=norm(q.answer);if(a===t)return true;
+  var alts=q.answer.split(/\s*\/\s*/);for(var i=0;i<alts.length;i++)if(norm(alts[i])===a)return true;
+  return false;
+}
+function vQuiz(){
+  var Q=S.quiz,q=Q.qs[Q.idx],it=q.it,n=Q.qs.length;
+  setCrumb(MODE_NAME[Q.mode]+' · '+(Q.idx+1)+'/'+n);
+  var h='<div class="prog"><i style="width:'+(Q.idx/n*100)+'%"></i></div><div class="panel"><div class="qhead"><span class="qtype">'+TYPE_NAME[q.type]+'</span><span class="muted">'+(Q.idx+1)+' / '+n+'</span></div>';
+  if(q.type==='m'){h+='<div class="prompt en">'+esc(it.word)+'</div><span class="muted">'+esc(it.cls)+' · 알맞은 뜻을 고르세요</span>'}
+  if(q.type==='d'){h+='<div class="prompt">'+esc(it.def)+'</div><span class="muted">이 영영풀이에 맞는 단어를 고르세요</span>'}
+  if(q.type==='s'){h+='<div class="prompt">'+esc(it.mean)+'</div><span class="hint">'+esc(it.cls)+' · '+hintOf(q.answer)+'</span>'}
+  if(q.type==='b'){var f=q.sent;h+='<div class="prompt sent">'+esc(f.s.slice(0,f.start))+'<span class="blank">'+(Q.locked?esc(f.ans):'&nbsp;')+'</span>'+esc(f.s.slice(f.end))+'</div><span class="hint">뜻: '+esc(shortMean(it.mean))+' · '+hintOf(q.answer)+' · 문장에 맞는 형태로 쓰세요</span>'}
+  if(q.opts){h+='<div class="opts">'+q.opts.map(function(o,i){return '<button class="opt" type="button" data-o="'+i+'">'+(i+1)+'. '+esc(o)+'</button>'}).join('')+'</div>'}
+  else{h+='<form id="tf" class="row" autocomplete="off"><input id="ta" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" style="flex:1" placeholder="영어로 쓰세요"><button class="btn" type="submit">확인</button></form>'}
+  h+='<div id="fb"></div></div><div class="row" style="justify-content:space-between"><button class="btn ghost small" type="button" id="qQuit">그만하기</button><span class="muted">맞은 개수 '+Q.answers.filter(function(a){return a.ok}).length+'</span></div>';
+  app.innerHTML=h;Q.locked=false;
+  document.getElementById('qQuit').onclick=function(){S.view=Q.back;render()};
+  if(q.opts){app.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){answer(q.opts[+b.dataset.o],b)}})}
+  else{var ta=document.getElementById('ta');ta.focus();document.getElementById('tf').onsubmit=function(e){e.preventDefault();if(Q.locked){next();return}if(!ta.value.trim())return;answer(ta.value)}}
+}
+function hintOf(ans){return '첫 글자 '+esc(ans.charAt(0))+' · '+ans.replace(/[^A-Za-z]/g,'').length+'글자'}
+function answer(val,btn){
+  var Q=S.quiz,q=Q.qs[Q.idx];if(Q.locked)return;Q.locked=true;
+  var ok=q.opts?(val===q.answer):checkTyped(q,val);
+  Q.answers.push({q:q,given:val,ok:ok});
+  if(q.opts){app.querySelectorAll('.opt').forEach(function(b){b.disabled=true;var o=q.opts[+b.dataset.o];if(o===q.answer)b.classList.add('right');else if(b===btn)b.classList.add('wrong')})}
+  else{document.getElementById('ta').readOnly=true;var bl=app.querySelector('.blank');if(bl)bl.textContent=q.answer}
+  var fb=document.getElementById('fb');
+  fb.innerHTML='<div class="fb '+(ok?'ok':'no')+'">'+(ok?'정답!':'오답 · 정답: '+esc(q.answer))+'</div>'+(ok?'':'<div class="row" style="margin-top:10px"><button class="btn" type="button" id="qNext">다음 문제</button>'+spkBtn(q.it.word)+'</div>');
+  if(ok){setTimeout(next,650)}else{var nb=document.getElementById('qNext');nb.onclick=next;if(q.opts)nb.focus()}
+}
+function next(){var Q=S.quiz;if(Q.adv===Q.idx)return;Q.adv=Q.idx;Q.idx++;if(Q.idx>=Q.qs.length)finish();else vQuiz()}
+function finish(){
+  var Q=S.quiz,score=Q.answers.filter(function(a){return a.ok}).length,total=Q.qs.length,pct=Math.round(score/total*100);
+  var pass=Q.mode==='wrong'?null:pct>=PASS[Q.mode];
+  Q.answers.forEach(function(a){var k=a.q.it.key,w=U().wrong[k];
+    if(a.ok){if(w){w.streak=(w.streak||0)+1;if(w.streak>=2)delete U().wrong[k]}}
+    else{w=w||{n:0,streak:0};w.n++;w.streak=0;U().wrong[k]=w}});
+  var now=new Date(),r={name:who().name,cls:who().cls,v:Q.v,d:Q.d,mode:Q.mode,score:score,total:total,when:stamp(now),pct:pct,pass:pass};
+  r.code=certCode(r);
+  if(Q.mode==='day'){var key=Q.v+'-'+Q.d,pr=U().prog[key]||{best:0,pass:false,tries:0};pr.tries++;pr.best=Math.max(pr.best,pct);if(pass)pr.pass=true;U().prog[key]=pr}
+  store.hist.push(r);persist();
+  if(API_URL){var o={};for(var k in r)o[k]=r[k];o.book=vol(r.v).n;o.dayLabel=dayLabel(r.d);o.modeName=MODE_NAME[r.mode];
+    o.wrongWords=Q.answers.filter(function(a){return !a.ok}).map(function(a){return a.q.it.word});store.outbox.push(o);saveOutbox();
+    S.sendState='sending';flush(function(ok){S.sendState=ok?'sent':'wait';var el=document.getElementById('sendSt');if(el)el.innerHTML=sendMsg()})}
+  S.result={r:r,answers:Q.answers,quiz:Q};go('result');
+}
+function sendMsg(){if(!API_URL)return '';return {sending:'<span class="muted">학원으로 결과를 보내는 중이에요…</span>',sent:'<span class="pill ok">학원으로 결과를 보냈어요</span>',wait:'<span class="pill no">인터넷이 연결되면 자동으로 다시 보내요</span>'}[S.sendState]||''}
+function vResult(){
+  var R=S.result,r=R.r,wrongs=R.answers.filter(function(a){return !a.ok});
+  setCrumb('시험 결과');
+  var dl=String(r.d).indexOf('-')>0?'DAY '+r.d:'DAY '+pad(+r.d);
+  var h='<div class="panel" style="align-items:center;text-align:center"><span class="eyebrow">'+MODE_NAME[r.mode]+'</span><div class="score">'+r.pct+'<span style="font-size:22px">%</span></div><div class="muted">'+r.total+'문제 중 '+r.score+'개 정답</div>'+
+  (r.pass===null?'':'<span class="stamp '+(r.pass?'ok':'no')+'">'+(r.pass?'PASS 합격':'RETRY 재시험')+'</span>')+(API_URL?'<div id="sendSt">'+sendMsg()+'</div>':'')+'</div>';
+  h+='<div class="panel"><h2>선생님께 보여 주세요</h2><dl class="cert"><dt>이름</dt><dd>'+esc(r.name)+'</dd><dt>교재</dt><dd>'+r.v+'권 '+esc(vol(r.v).n)+' · '+dl+'</dd><dt>시험</dt><dd>'+MODE_NAME[r.mode]+'</dd><dt>점수</dt><dd>'+r.score+' / '+r.total+' ('+r.pct+'%)</dd><dt>일시</dt><dd>'+r.when+'</dd><dt>확인 코드</dt><dd class="code">'+r.code+'</dd></dl>'+
+  '<p class="muted" style="margin:0">이 화면을 캡처해서 보내거나 선생님께 직접 보여 주세요. 확인 코드로 점수가 바뀌지 않았는지 확인할 수 있어요.</p></div>';
+  if(wrongs.length){h+='<div class="panel"><h2>틀린 단어 '+wrongs.length+'개</h2><div class="list">'+wrongs.map(function(a){return '<div class="li"><span class="w">'+esc(a.q.it.word)+spkBtn(a.q.it.word)+'</span><span class="m">'+esc(shortMean(a.q.it.mean))+'<br>내 답: '+esc(a.given)+'</span></div>'}).join('')+'</div><p class="muted" style="margin:0">틀린 단어는 오답노트에 자동으로 들어가요. 연속 2번 맞히면 빠져요.</p></div>'}
+  h+='<div class="row">'+(wrongs.length?'<button class="btn" type="button" id="rRetry">틀린 문제만 다시</button>':'')+'<button class="btn ghost" type="button" id="rAgain">같은 시험 다시</button><button class="btn ghost" type="button" id="rBack">돌아가기</button>'+(store.mode==='academy'?'<button class="btn ghost" type="button" id="rOut">시험 끝 · 학생 바꾸기</button>':'')+'</div>';
+  app.innerHTML=h;
+  var Q=R.quiz;
+  if(wrongs.length)document.getElementById('rRetry').onclick=function(){S.quiz={mode:'retry',v:Q.v,d:Q.d,qs:shuffle(wrongs.map(function(a){return makeQ(a.q.it,a.q.type)})),idx:0,answers:[],back:Q.back};go('quiz')};
+  document.getElementById('rAgain').onclick=function(){S.quiz={mode:Q.mode,v:Q.v,d:Q.d,qs:assignTypes(Q.qs.map(function(x){return x.it})),idx:0,answers:[],back:Q.back};go('quiz')};
+  var ro=document.getElementById('rOut');if(ro)ro.onclick=logout;
+  document.getElementById('rBack').onclick=function(){S.view=Q.back;if(Q.back==='day')S.tab='test';render()};
+}
+
+function vWrong(){
+  setCrumb('오답노트');
+  var keys=Object.keys(U().wrong),byVol={};
+  keys.forEach(function(k){var v=+k.split('-')[0];(byVol[v]=byVol[v]||[]).push(k)});
+  var h='<div class="panel"><span class="eyebrow">Wrong answer note</span><h1>오답노트</h1><p class="muted" style="margin:0">시험에서 틀리거나 카드에서 "헷갈려요"를 누른 단어가 모여요. 시험에서 연속 2번 맞히면 자동으로 빠져요.</p></div>';
+  if(!keys.length)h+='<div class="panel"><p style="margin:0">아직 오답노트가 비어 있어요. DAY 시험을 보면 틀린 단어가 여기에 쌓여요.</p></div>';
+  Object.keys(byVol).sort(function(a,b){return a-b}).forEach(function(v){
+    var ks=byVol[v].sort(function(a,b){var x=a.split('-'),y=b.split('-');return x[1]-y[1]||x[2]-y[2]});
+    h+='<div class="panel"><div class="row" style="justify-content:space-between"><h2>'+v+'권 '+esc(vol(+v).n)+' · '+ks.length+'개</h2><button class="btn small" type="button" data-wv="'+v+'">오답 시험</button></div><div class="list">'+
+    ks.map(function(k){var a=k.split('-'),it=W(+a[0],+a[1],+a[2]);return '<div class="li"><span class="w">'+esc(it.word)+spkBtn(it.word)+'</span><span class="m">'+esc(shortMean(it.mean))+'</span><span class="pill no">DAY '+pad(it.d)+' · '+U().wrong[k].n+'회</span></div>'}).join('')+'</div></div>'});
+  app.innerHTML=h;
+  app.querySelectorAll('[data-wv]').forEach(function(b){b.onclick=function(){var v=+b.dataset.wv;
+    var items=byVol[v].map(function(k){var a=k.split('-');return W(+a[0],+a[1],+a[2])});items=shuffle(items).slice(0,40);
+    S.v=v;startQuiz('wrong',v,'오답',items)}});
+}
+
+function vHist(){
+  setCrumb('내 시험 기록');
+  var me=who(),hs=store.hist.filter(function(r){return store.mode!=='academy'||(r.name===me.name&&(r.cls||'')===(me.cls||''))}).slice().reverse();
+  var h='<div class="panel"><span class="eyebrow">History</span><h1>내 시험 기록</h1><p class="muted" style="margin:0">이 기기에서 본 시험만 저장돼요. 최근 순서예요.</p></div>';
+  if(!hs.length)h+='<div class="panel"><p style="margin:0">아직 본 시험이 없어요.</p></div>';
+  else h+='<div class="tbl-wrap"><table><thead><tr><th>일시</th><th>교재</th><th>시험</th><th>점수</th><th>코드</th></tr></thead><tbody>'+hs.map(function(r){
+    return '<tr><td class="no">'+r.when+'</td><td>'+r.v+'권 DAY '+esc(r.d)+'</td><td class="cls">'+MODE_NAME[r.mode]+'</td><td><b>'+r.score+'/'+r.total+'</b> '+(r.pass===null?'':'<span class="pill '+(r.pass?'ok':'no')+'">'+(r.pass?'합격':'재시험')+'</span>')+'</td><td class="no">'+r.code+'</td></tr>'}).join('')+'</tbody></table></div>';
+  app.innerHTML=h;
+}
+
+function vTeacher(){
+  setCrumb('선생님');
+  if(!S.tAuth){
+    app.innerHTML='<div class="panel"><span class="eyebrow">For teachers</span><h1>선생님 화면</h1><p class="muted" style="margin:0">선생님 비밀번호를 넣으세요. 처음 비밀번호는 0000이에요. 설정에서 바꿀 수 있어요.</p>'+
+    '<form id="pinF" class="row" autocomplete="off"><input id="pinIn" type="password" inputmode="numeric" placeholder="비밀번호" style="flex:1" aria-label="비밀번호"><button class="btn" type="submit">들어가기</button></form><div id="pinOut"></div></div>';
+    var pi=document.getElementById('pinIn');pi.focus();
+    var po=document.getElementById('pinOut');
+    document.getElementById('pinF').onsubmit=function(e){e.preventDefault();
+      if(!API_URL){if(pi.value===store.pin){S.tAuth=true;S.ttab='res';render()}else po.innerHTML='<div class="fb no">비밀번호가 맞지 않아요.</div>';return}
+      po.innerHTML='<span class="muted">확인하는 중이에요…</span>';
+      api({action:'results',pw:pi.value}).then(function(res){if(res&&res.ok){S.tAuth=true;S.pw=pi.value;S.remote=res.results;S.ttab='res';render()}else po.innerHTML='<div class="fb no">비밀번호가 맞지 않아요.</div>'})
+      .catch(function(){po.innerHTML='<div class="fb no">서버에 연결하지 못했어요. 인터넷 연결을 확인하세요.</div>'})};
+    return;
+  }
+  S.ttab=S.ttab||'res';
+  var h='<div class="row" style="justify-content:space-between"><h1>선생님 화면</h1><button class="btn small ghost" type="button" id="tOut">나가기</button></div>'+
+  '<div class="tabs">'+[['res','시험 결과'],['sum','학생별 요약'],['ros','반·학생 명단'],['set','설정'],['chk','코드 확인']].map(function(t){return '<button class="tab'+(S.ttab===t[0]?' on':'')+'" type="button" data-ttab="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div><div id="tBody"></div>';
+  app.innerHTML=h;
+  document.getElementById('tOut').onclick=function(){S.tAuth=false;go('home')};
+  app.querySelectorAll('[data-ttab]').forEach(function(b){b.onclick=function(){S.ttab=b.dataset.ttab;render()}});
+  var tb=document.getElementById('tBody');
+  ({res:ttRes,sum:ttSum,ros:ttRos,set:ttSet,chk:ttChk})[S.ttab](tb);
+}
+function classOpts(sel){var cs={};store.roster.forEach(function(r){cs[r.c]=1});store.hist.forEach(function(r){if(r.cls)cs[r.cls]=1});
+  return '<option value="">전체 반</option>'+Object.keys(cs).map(function(c){return '<option'+(c===sel?' selected':'')+'>'+esc(c)+'</option>'}).join('')}
+function filteredHist(){
+  var F=S.tf||(S.tf={cls:'',days:'7',mode:''});var lim=F.days?Date.now()-(+F.days)*864e5:0;
+  return (API_URL&&S.remote?S.remote:store.hist).filter(function(r){
+    if(F.cls&&r.cls!==F.cls)return false;if(F.mode&&r.mode!==F.mode)return false;
+    if(lim){var t=new Date(r.when.replace(' ','T')).getTime();if(t<lim)return false}return true}).slice().reverse();
+}
+function filterBar(){
+  var F=S.tf||(S.tf={cls:'',days:'7',mode:''});
+  return '<div class="row"><select id="f_cls" aria-label="반">'+classOpts(F.cls)+'</select>'+
+  '<select id="f_days" aria-label="기간">'+[['1','오늘'],['7','최근 7일'],['30','최근 30일'],['',API_URL?'최근 6개월':'전체']].map(function(o){return '<option value="'+o[0]+'"'+(F.days===o[0]?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select>'+
+  '<select id="f_mode" aria-label="시험 종류"><option value="">모든 시험</option>'+Object.keys(MODE_NAME).map(function(k){return '<option value="'+k+'"'+(F.mode===k?' selected':'')+'>'+MODE_NAME[k]+'</option>'}).join('')+'</select></div>';
+}
+function bindFilter(redraw){['cls','days','mode'].forEach(function(k){document.getElementById('f_'+k).onchange=function(e){S.tf[k]=e.target.value;redraw()}})}
+function dayLabel(d){return /^\d+$/.test(String(d))?'DAY '+pad(+d):(d==='오답'?'오답노트':'DAY '+d)}
+var RES_HEAD=['일시','반','이름','권','교재','DAY','시험 종류','맞은 수','문항 수','점수(%)','결과','확인 코드'];
+function resRow(r){return [r.when,r.cls||'',r.name,r.v,vol(r.v).n,dayLabel(r.d),MODE_NAME[r.mode],r.score,r.total,r.pct,r.pass===null?'-':(r.pass?'합격':'재시험'),r.code]}
+function toCSV(rows){return '﻿'+rows.map(function(r){return r.map(function(c){c=String(c);return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c}).join(',')}).join('\r\n')}
+function toTSV(rows){return rows.map(function(r){return r.map(function(c){return String(c).replace(/[\t\n]/g,' ')}).join('\t')}).join('\n')}
+function dl(name,text){try{var b=new Blob([text],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},500)}catch(e){}}
+function copyText(text,btn){var done=function(){btn.textContent='복사됨! 엑셀에 붙여 넣으세요'};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done,fallback);else fallback();
+  function fallback(){var t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){}t.remove()}}
+function fileStamp(){var t=new Date();return t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate())+'_'+pad(t.getHours())+pad(t.getMinutes())}
+function ttRes(tb){
+  var rows=filteredHist();
+  var h=filterBar()+'<div class="row"><button class="btn small" type="button" id="xCsv">엑셀(CSV) 저장</button><button class="btn small ghost" type="button" id="xCopy">표 복사</button>'+(API_URL?'<button class="btn small ghost" type="button" id="xRef">새로 고침</button>':'')+'<span class="muted">'+rows.length+'건'+(API_URL?' · 모든 기기 결과':' · 이 기기 결과')+'</span></div>';
+  if(!rows.length)h+='<div class="panel"><p style="margin:0">이 조건에 맞는 시험 결과가 없어요.</p></div>';
+  else h+='<div class="tbl-wrap"><table><thead><tr><th>일시</th><th>반</th><th>이름</th><th>교재</th><th>시험</th><th>점수</th></tr></thead><tbody>'+rows.map(function(r){
+    return '<tr><td class="no">'+r.when.slice(5)+'</td><td class="cls">'+esc(r.cls||'')+'</td><td class="w">'+esc(r.name)+'</td><td>'+r.v+'권 '+dayLabel(r.d)+'</td><td class="cls">'+MODE_NAME[r.mode]+'</td><td style="white-space:nowrap"><b>'+r.score+'/'+r.total+'</b> '+(r.pass===null?'':'<span class="pill '+(r.pass?'ok':'no')+'">'+(r.pass?'합격':'재시험')+'</span>')+'</td></tr>'}).join('')+'</tbody></table></div>';
+  if(!API_URL)h+='<div class="panel"><h2>기록 지우기</h2><p class="muted" style="margin:0">이 기기에 쌓인 시험 결과를 모두 지워요. 먼저 엑셀로 저장해 두세요.</p><div class="row" id="delRow"><button class="btn small ghost" type="button" id="xDel">모든 결과 지우기</button></div></div>';
+  tb.innerHTML=h;bindFilter(function(){ttRes(tb)});
+  var all=[RES_HEAD].concat(rows.map(resRow));
+  document.getElementById('xCsv').onclick=function(){dl('보카토리_시험결과_'+fileStamp()+'.csv',toCSV(all))};
+  document.getElementById('xCopy').onclick=function(){copyText(toTSV(all),this)};
+  var xr=document.getElementById('xRef');if(xr)xr.onclick=function(){xr.textContent='불러오는 중…';api({action:'results',pw:S.pw}).then(function(res){if(res&&res.ok)S.remote=res.results;ttRes(tb)}).catch(function(){xr.textContent='연결 실패'})};
+  if(!API_URL)document.getElementById('xDel').onclick=function(){document.getElementById('delRow').innerHTML='<span style="color:var(--bad);font-weight:700">정말 지울까요? 되돌릴 수 없어요.</span><button class="btn small" style="background:var(--bad)" type="button" id="xDel2">지우기</button><button class="btn small ghost" type="button" id="xDelNo">취소</button>';
+    document.getElementById('xDel2').onclick=function(){store.hist=[];persist();ttRes(tb)};document.getElementById('xDelNo').onclick=function(){ttRes(tb)}};
+}
+function ttSum(tb){
+  var rows=filteredHist(),by={};
+  rows.forEach(function(r){var k=(r.cls||'')+'|'+r.name,s=by[k]||(by[k]={cls:r.cls||'',name:r.name,n:0,sum:0,dayPass:{},last:r.when,lastTxt:r.v+'권 '+dayLabel(r.d)});s.n++;s.sum+=r.pct;if(r.mode==='day'&&r.pass)s.dayPass[r.v+'-'+r.d]=1});
+  var list=Object.keys(by).map(function(k){var s=by[k];return [s.cls,s.name,s.n,Math.round(s.sum/s.n),Object.keys(s.dayPass).length,s.last,s.lastTxt]}).sort(function(a,b){return a[0]<b[0]?-1:a[0]>b[0]?1:(a[1]<b[1]?-1:1)});
+  var head=['반','이름','시험 수','평균(%)','합격한 DAY 수','최근 시험 일시','최근 시험'];
+  var h=filterBar()+'<div class="row"><button class="btn small" type="button" id="sCsv">엑셀(CSV) 저장</button><button class="btn small ghost" type="button" id="sCopy">표 복사</button><span class="muted">'+list.length+'명</span></div>';
+  if(!list.length)h+='<div class="panel"><p style="margin:0">이 조건에 맞는 시험 결과가 없어요.</p></div>';
+  else h+='<div class="tbl-wrap"><table><thead><tr><th>반</th><th>이름</th><th>시험</th><th>평균</th><th>합격 DAY</th><th>최근</th></tr></thead><tbody>'+list.map(function(s){return '<tr><td class="cls">'+esc(s[0])+'</td><td class="w">'+esc(s[1])+'</td><td>'+s[2]+'회</td><td><b>'+s[3]+'%</b></td><td>'+s[4]+'</td><td class="cls">'+s[5].slice(5)+'<br>'+esc(s[6])+'</td></tr>'}).join('')+'</tbody></table></div>';
+  tb.innerHTML=h;bindFilter(function(){ttSum(tb)});
+  var all=[head].concat(list);
+  document.getElementById('sCsv').onclick=function(){dl('보카토리_학생별요약_'+fileStamp()+'.csv',toCSV(all))};
+  document.getElementById('sCopy').onclick=function(){copyText(toTSV(all),this)};
+}
+function ttRos(tb){
+  var txt=store.roster.map(function(r){return r.c+': '+r.n.join(', ')}).join('\n');
+  tb.innerHTML='<div class="panel"><h2>반·학생 명단</h2><p class="muted" style="margin:0">한 줄에 한 반씩, "반 이름: 학생, 학생" 형태로 넣으세요. 학생은 시험 전에 자기 반과 이름을 골라요.</p>'+
+  '<textarea id="rosIn" rows="10" style="font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:10px;width:100%" placeholder="중1 A반: 김민준, 이서연, 박지호&#10;초6 B반: 최유나, 정하준">'+esc(txt)+'</textarea>'+
+  '<div class="row"><button class="btn" type="button" id="rosSave">명단 저장</button><span id="rosOut" class="muted"></span></div></div>';
+  document.getElementById('rosSave').onclick=function(){
+    var out=[];document.getElementById('rosIn').value.split('\n').forEach(function(line){var i=line.indexOf(':');if(i<0)i=line.indexOf('：');if(i<0)return;
+      var c=line.slice(0,i).trim(),n=line.slice(i+1).split(/[,，、]/).map(function(x){return x.trim()}).filter(Boolean);if(c&&n.length)out.push({c:c,n:n})});
+    store.roster=out;persist();var ro=document.getElementById('rosOut'),msg=out.length+'개 반, '+out.reduce(function(a,r){return a+r.n.length},0)+'명 저장했어요.';
+    if(!API_URL){ro.textContent=msg;return}
+    ro.textContent='학원 서버에 저장하는 중…';apiPost({action:'saveRoster',pw:S.pw,roster:out}).then(function(res){ro.textContent=res&&res.ok?msg+' 모든 기기에 적용돼요.':'저장하지 못했어요. 다시 시도해 주세요.'}).catch(function(){ro.textContent='서버에 연결하지 못했어요.'})
+  };
+}
+function ttSet(tb){
+  tb.innerHTML='<div class="panel"><h2>사용 방식</h2>'+
+  '<label class="row"><input type="radio" name="md" id="md_a" value="academy"'+(store.mode==='academy'?' checked':'')+'> <span><b>학원용</b> · 여러 학생이 이 PC·태블릿을 같이 써요. 시험 전에 반과 이름을 고르고, 결과가 모두 이 기기에 모여요.</span></label>'+
+  '<label class="row"><input type="radio" name="md" id="md_p" value="personal"'+(store.mode!=='academy'?' checked':'')+'> <span><b>개인용</b> · 학생 한 명이 자기 폰이나 PC에서 써요.</span></label>'+
+  '<div class="row"><button class="btn small" type="button" id="mdSave">저장</button><span id="mdOut" class="muted"></span></div></div>'+
+  '<div class="panel"><h2>선생님 비밀번호 바꾸기</h2><div class="row"><input id="pin1" type="password" inputmode="numeric" placeholder="새 비밀번호 (4자리 이상)" style="flex:1" aria-label="새 비밀번호"><button class="btn small" type="button" id="pinSave">바꾸기</button></div><span id="pinOut2" class="muted"></span></div>';
+  document.getElementById('mdSave').onclick=function(){store.mode=document.getElementById('md_a').checked?'academy':'personal';S.user=null;persist();document.getElementById('mdOut').textContent=(store.mode==='academy'?'학원용':'개인용')+'으로 바꿨어요.'};
+  document.getElementById('pinSave').onclick=function(){var v=document.getElementById('pin1').value.trim();var o=document.getElementById('pinOut2');if(v.length<4){o.textContent='4자리 이상 넣어 주세요.';return}if(!API_URL){store.pin=v;persist();o.textContent='비밀번호를 바꿨어요.';return}
+    apiPost({action:'setPw',pw:S.pw,newPw:v}).then(function(res){if(res&&res.ok){S.pw=v;o.textContent='비밀번호를 바꿨어요. 모든 기기에 적용돼요.'}else o.textContent='바꾸지 못했어요.'}).catch(function(){o.textContent='서버에 연결하지 못했어요.'})};
+}
+function ttChk(tb){
+  var vo=DATA.map(function(V){return '<option value="'+V.v+'">'+V.v+'권 '+esc(V.n)+'</option>'}).join('');
+  var mo=Object.keys(MODE_NAME).map(function(k){return '<option value="'+k+'">'+MODE_NAME[k]+'</option>'}).join('');
+  tb.innerHTML='<div class="panel"><h2>확인 코드 검사</h2><p class="muted" style="margin:0">학생이 다른 기기에서 본 시험의 결과 화면을 그대로 넣으면, 확인 코드가 맞는지 알려 줘요.</p>'+
+  '<input id="t_name" type="text" placeholder="이름" aria-label="이름">'+
+  '<div class="row"><select id="t_v" aria-label="권">'+vo+'</select><input id="t_d" type="text" placeholder="DAY (예: 3 또는 1-4)" aria-label="DAY" style="flex:1"></div>'+
+  '<select id="t_m" aria-label="시험 종류">'+mo+'</select>'+
+  '<div class="row"><input id="t_s" type="number" inputmode="numeric" placeholder="맞은 수" aria-label="맞은 수" style="flex:1"><span>/</span><input id="t_t" type="number" inputmode="numeric" placeholder="문항 수" aria-label="문항 수" style="flex:1"></div>'+
+  '<input id="t_w" type="text" placeholder="일시 (예: 2026-11-23 14:05)" aria-label="일시">'+
+  '<input id="t_c" type="text" placeholder="확인 코드 6자리" aria-label="확인 코드" autocapitalize="characters" style="letter-spacing:.15em">'+
+  '<div class="row"><button class="btn" type="button" id="t_go">확인하기</button></div><div id="t_out"></div></div>';
+  document.getElementById('t_go').onclick=function(){
+    var g=function(id){return document.getElementById(id).value.trim()};
+    var dv=g('t_d');if(/^\d+$/.test(dv))dv=String(+dv);
+    var r={name:g('t_name'),v:+g('t_v'),d:g('t_m')==='wrong'?'오답':dv,mode:g('t_m'),score:+g('t_s'),total:+g('t_t'),when:g('t_w')};
+    var ok=certCode(r)===g('t_c').toUpperCase().replace(/\s/g,'');
+    document.getElementById('t_out').innerHTML='<div class="fb '+(ok?'ok':'no')+'">'+(ok?'코드가 맞아요. 결과가 그대로예요.':'코드가 맞지 않아요. 입력 내용을 다시 확인하세요.')+'</div>';
+  };
+}
+
+/* ---------- events ---------- */
+app.addEventListener('click',function(e){
+  var t=e.target.closest('[data-say]');if(t){e.stopPropagation();speak(t.dataset.say);return}
+  t=e.target.closest('[data-vol]');if(t){go('vol',{v:+t.dataset.vol});return}
+  t=e.target.closest('[data-day]');if(t){go('day',{d:+t.dataset.day,tab:'list',ci:0,flip:false});return}
+  t=e.target.closest('[data-tab]');if(t){S.tab=t.dataset.tab;S.flip=false;render();return}
+});
+document.addEventListener('keydown',function(e){
+  if(S.view!=='quiz'||!S.quiz)return;var q=S.quiz.qs[S.quiz.idx];
+  if(q.opts&&!S.quiz.locked&&/^[1-4]$/.test(e.key)){var b=app.querySelector('[data-o="'+(+e.key-1)+'"]');if(b)b.click()}
+  else if(S.quiz.locked&&e.key==='Enter'&&q.opts){var nb=document.getElementById('qNext');if(nb&&document.activeElement!==nb){e.preventDefault();nb.click()}}
+});
+document.getElementById('logo').onclick=function(){go('home')};
+document.getElementById('btnWrong').onclick=function(){go('wrong')};
+document.getElementById('lnkHist').onclick=function(){go('hist')};
+document.getElementById('lnkTeacher').onclick=function(){go('teacher')};
+
+function boot(d){DATA=d;render();if(API_URL){if(store.mode==='academy')loadRoster(function(){if(S.view==='home')render()});flush();setInterval(flush,60000)}}
+if(window.VOCA_DATA)boot(window.VOCA_DATA);
+else fetch('data.json').then(function(r){return r.json()}).then(boot).catch(function(){app.innerHTML='<div class="panel"><p>단어 데이터를 불러오지 못했어요. 페이지를 새로 고쳐 주세요.</p></div>'});
+})();
+</script>
